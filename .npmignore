@@ -4,7 +4,7 @@ node_modules
 android
 ios
 __tests__
-./App.tsx
+./App.js
 ./index.js
 ./babel.config.js
 ./metro.config.js

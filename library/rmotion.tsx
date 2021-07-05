@@ -148,6 +148,8 @@ export function rmotion<T>(Component: React.ComponentType<T>) {
       ]);
     }, [prevRef.current.dep]);
 
+    console.log(conf);
+
     return <AnimatedComponent {...rest} ref={ref} style={[style, animStyle]} />;
   });
 

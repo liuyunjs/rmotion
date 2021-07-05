@@ -19,7 +19,7 @@ export class BasisConfItem<Config> {
   protected readonly _position: Animated.Value<number>;
   protected readonly _clock = new Clock();
 
-  protected readonly _toValue: Animated.Value<number>;
+  protected readonly _toValue: Animated.Adaptable<number>;
   protected readonly _localConf?: Config;
   protected readonly _globalConf?: Config;
   protected readonly _currentConf?: Config;
@@ -35,7 +35,7 @@ export class BasisConfItem<Config> {
     globalConf?: Config,
   ) {
     this._position = position;
-    this._toValue = new Value(anim.value);
+    this._toValue = anim.value;
     this._currentConf = anim.config;
     this._localConf = localConf;
     this._globalConf = globalConf;

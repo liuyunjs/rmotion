@@ -15,7 +15,7 @@ import { RMotionView, AnimatePresence } from './library';
 
 PortalStore.getUpdater('default').setContainer(AnimatePresence);
 
-const Modal = ({ visible }: { visible: boolean }) => {
+const Modal = ({ visible }) => {
   return (
     <AnimatePresence>
       {visible && (
@@ -47,8 +47,8 @@ const Modal = ({ visible }: { visible: boolean }) => {
 
 const App = () => {
   const [visible, setVisible] = React.useState(false);
-  const ref = React.useRef<string>();
-
+  const ref = React.useRef();
+  console.log(11);
   return (
     <SafeAreaView>
       <Text onPress={() => setVisible(!visible)} style={{ fontSize: 30 }}>

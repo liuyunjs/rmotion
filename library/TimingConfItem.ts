@@ -7,7 +7,8 @@ const { Value, timing } = Animated;
 export class TimingConfItem extends BasisConfItem<TimingAnimConf> {
   private readonly _frameTime = new Value(0);
 
-  protected readonly _defaultConf = {
+  // @ts-ignore
+  protected readonly _defaultConf: Required<Omit<TimingAnimConf, 'type'>> = {
     easing: (EasingNode || Easing).linear,
     duration: 300,
   };
