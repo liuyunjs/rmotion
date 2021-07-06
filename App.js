@@ -63,7 +63,7 @@ const App = () => {
           }
           ref.current = PortalStore.getUpdater('default').add(
             <RMotionView
-              config={{ type: 'spring' }}
+              // config={{ type: 'spring' }}
               onDidAnimate={console.log}
               exit={{ opacity: 0, translateY: -400 }}
               from={{ opacity: 0.3, translateY: 400 }}

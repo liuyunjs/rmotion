@@ -6,7 +6,7 @@ import hoistNonReactStatics from 'hoist-non-react-statics';
 import { usePresence } from 'framer-motion/dist/es/components/AnimatePresence/use-presence';
 import { BasisConf } from './BasisConf';
 import { ColorConf } from './ColorConf';
-import { ConfRef, AnimationProps, AnimationConf } from './types';
+import { ConfRef, AnimationProps, AnimationConf, WithConf } from './types';
 import { isTransform, isColor } from './utils';
 
 const { block, useCode, cond, call, Value, add, set, eq, onChange } = Animated;
@@ -24,23 +24,36 @@ export function rmotion<T>(Component: React.ComponentType<T>) {
     const [isPresent, safeToUnmount] = usePresence();
 
     const hasExitStyle =
-      typeof exit === 'object' && !!Object.keys(exit ?? {}).length;
+      !!exit && typeof exit === 'object' && !!Object.keys(exit).length;
 
     let conf = confRef.current;
 
-    if (
-      !prevRef.current ||
-      (animate && !equal(animate, prevRef.current.value, 4))
+    if (isPresent || !hasExitStyle) {
+      if (
+        !prevRef.current ||
+        (animate && !equal(animate, prevRef.current.value, 4))
+      ) {
+        prevRef.current = { value: animate!, dep: [] };
+        processor(animate!);
+      }
+    }
+
+    React.useMemo(() => {
+      if (!isPresent && hasExitStyle) {
+        prevRef.current!.dep = [];
+        processor(exit!);
+      }
+      //  eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isPresent, hasExitStyle]);
+
+    function createAndUpdateStyle(
+      key: string,
+      animValue: number | WithConf<number>,
     ) {
-      prevRef.current = { value: animate!, dep: [] };
-      processor(animate!);
-    }
+      conf![key] = isColor(key)
+        ? new ColorConf(animValue)
+        : new BasisConf(animValue);
 
-    if (!isPresent && hasExitStyle) {
-      prevRef.current.dep = [];
-    }
-
-    function updateStyle(key: string) {
       if (isTransform(key)) {
         if (!animStyle.transform) animStyle.transform = [];
         animStyle.transform.push({ [key]: conf![key].value });
@@ -74,25 +87,16 @@ export function rmotion<T>(Component: React.ComponentType<T>) {
           if (!conf[key]) {
             if (Array.isArray(animItem)) {
               if (!animItem.length) continue;
-              const animValue = animItem[0];
-              conf[key] = isColor(key)
-                ? new ColorConf(animValue)
-                : new BasisConf(animValue);
-
-              updateStyle(key);
+              createAndUpdateStyle(key, animItem[0]);
 
               for (let k = 1, aLen = animItem.length; k < aLen; k++) {
                 conf[key].add(animItem[k], confItem, config);
               }
             } else {
-              conf[key] = isColor(key)
-                ? new ColorConf(animItem)
-                : new BasisConf(animItem);
-              updateStyle(key);
+              createAndUpdateStyle(key, animItem);
             }
           } else {
             if (Array.isArray(animItem)) {
-              if (!animItem.length) continue;
               for (let k = 0, aLen = animItem.length; k < aLen; k++) {
                 conf[key].add(animItem[k], confItem, config);
               }
@@ -104,15 +108,8 @@ export function rmotion<T>(Component: React.ComponentType<T>) {
       }
     }
 
-    React.useMemo(() => {
-      if (!isPresent && hasExitStyle) {
-        processor(exit!);
-      }
-      // eslint-disable-next-line
-    }, [isPresent, hasExitStyle]);
-
     React.useEffect(
-      function allowUnMountIfMissingExit() {
+      function () {
         if (!isPresent && !hasExitStyle) {
           safeToUnmount?.();
         }
@@ -146,9 +143,7 @@ export function rmotion<T>(Component: React.ComponentType<T>) {
           }),
         ),
       ]);
-    }, [prevRef.current.dep]);
-
-    console.log(conf);
+    }, [prevRef.current!.dep]);
 
     return <AnimatedComponent {...rest} ref={ref} style={[style, animStyle]} />;
   });
