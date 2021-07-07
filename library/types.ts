@@ -96,23 +96,60 @@ type BasisStyle = {
   letterSpacing: number;
   lineHeight: number;
   textShadowRadius: number;
+  width: number;
+  height: number;
+
+  left: number;
+  margin: number;
+  marginBottom: number;
+  marginEnd: number;
+  marginHorizontal: number;
+  marginLeft: number;
+  marginRight: number;
+  marginStart: number;
+  marginTop: number;
+  marginVertical: number;
+  maxHeight: number;
+  maxWidth: number;
+  minHeight: number;
+  minWidth: number;
+  padding: number;
+  paddingBottom: number;
+  paddingEnd: number;
+  paddingHorizontal: number;
+  paddingLeft: number;
+  paddingRight: number;
+  paddingStart: number;
+  paddingTop: number;
+  paddingVertical: number;
+  right: number;
+  start: number;
+  top: number;
+  end: number;
+  bottom: number;
+  borderEndWidth: number;
+  borderStartWidth: number;
 };
 
 export type AnimationConf = AnimAnimate<AnimFrom<ColorStyle, number | string>> &
   AnimAnimate<AnimFrom<TransStyle, number>> &
   AnimAnimate<AnimFrom<BasisStyle, number>> & { config?: OneOfAnimConf };
 
-export type AnimationProps = {
+export type AnimationPresupposition = {
   from?: AnimFrom<ColorStyle, number | string> &
     AnimFrom<TransStyle, number> &
     AnimFrom<BasisStyle, number>;
   animate?: AnimationConf;
   exit?: AnimationConf;
+};
+
+export type AnimationProps = AnimationPresupposition & {
   config?: OneOfAnimConf;
   style?: StyleProp<ViewStyle & ImageStyle & TextStyle>;
   children?: React.ReactNode;
   motionRef?: React.Ref<ConfRef>;
   onDidAnimate?: (exit: boolean) => void;
+  onWillAnimate?: (exit: boolean) => void;
 };
 
 export type ConfRef = Record<string, BasisConf | ColorConf>;

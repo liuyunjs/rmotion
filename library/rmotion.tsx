@@ -15,7 +15,17 @@ export function rmotion<T>(Component: React.ComponentType<T>) {
   // @ts-ignore
   const AnimatedComponent = Animated.createAnimatedComponent(Component);
   const Motion = React.forwardRef<any, T & AnimationProps>(function Motion(
-    { from, animate, exit, config, style, motionRef, onDidAnimate, ...rest },
+    {
+      from,
+      animate,
+      exit,
+      config,
+      style,
+      motionRef,
+      onDidAnimate,
+      onWillAnimate,
+      ...rest
+    },
     ref,
   ) {
     const confRef = React.useRef<ConfRef>();
@@ -130,6 +140,8 @@ export function rmotion<T>(Component: React.ComponentType<T>) {
 
       const len = nodes.length;
       if (!len) return;
+
+      onWillAnimate?.(!isPresent);
 
       const total = new Value(0);
 
