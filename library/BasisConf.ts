@@ -1,5 +1,4 @@
 import Animated from 'react-native-reanimated';
-import { getConf } from './utils';
 import { OneOfAnimConf, WithConf } from './types';
 import { SpringConfItem } from './SpringConfItem';
 import { TimingConfItem } from './TimingConfItem';
@@ -24,10 +23,12 @@ export class BasisConf {
   ) {
     const conf = typeof value === 'number' ? { value } : value;
 
-    const ConfItem =
-      getConf('type', 'timing', conf.config, localConf, globalConf) === 'spring'
-        ? SpringConfItem
-        : TimingConfItem;
+    const confType =
+      (conf.config && conf.config.type) ||
+      (localConf && localConf.type) ||
+      (globalConf && globalConf.type);
+
+    const ConfItem = confType === 'spring' ? SpringConfItem : TimingConfItem;
 
     // @ts-ignore
     this._items.push(new ConfItem(this.value, conf, localConf, globalConf));
