@@ -11,7 +11,7 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, Text } from 'react-native';
 import { Portal, PortalStore, PortalProvider } from 'react-native-portal-view';
-import { RMotionView, AnimatePresence } from './library';
+import { RMotionView, AnimatePresence } from './library/main';
 
 PortalStore.getUpdater('default').setContainer(AnimatePresence);
 

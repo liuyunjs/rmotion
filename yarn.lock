@@ -958,10 +958,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@liuyunjs/hooks@^1.1.0-beta1":
-  version "1.1.0-beta1"
-  resolved "https://registry.yarnpkg.com/@liuyunjs/hooks/-/hooks-1.1.0-beta1.tgz#14ea0823a5379f67a579e8a2c822df99ef0f46fb"
-  integrity sha512-l2NmVEMZKc1vVxFnW5jMLxxjGU354KynGFyFOuuwpF/m1d5oXeTirzMVuhxRmMCcJs679a+PRUDmS4/XqMuF7Q==
+"@liuyunjs/hooks@^1.1.5":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@liuyunjs/hooks/-/hooks-1.1.5.tgz#828ac6d08870b6a4f2053f587503ddc808b3c47d"
+  integrity sha512-6dX8Zq/xwDmZ9EldARqlvNt/gW8CYkbNef3QcyBVf+8lR0AIdo8+n9eTFj9cBBhJUhboNywLfqcUwbyOoGwMBA==
   dependencies:
     "@liuyunjs/timer" "^1.0.0-beta3"
     "@liuyunjs/utils" "^1.0.0"
