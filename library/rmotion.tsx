@@ -82,7 +82,7 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
           conf = confRef.current = {};
           if (from) {
             Object.keys(from).forEach((key) => {
-              if (animConf[key]) {
+              if (animConf[key] != null) {
                 animConf[key] = maybeToArr(animConf[key]);
                 animConf[key].unshift((from as any)[key]);
               } else {
