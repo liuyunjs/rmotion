@@ -1,164 +1,161 @@
-import React from 'react';
-import Animated from 'react-native-reanimated';
+import * as React from 'react';
+import Animated, {
+  block,
+  useCode,
+  cond,
+  call,
+  Value,
+  add,
+  set,
+  eq,
+  onChange,
+} from 'react-native-reanimated';
 import { equal } from '@liuyunjs/utils/lib/equal';
+import { isAnyObject } from '@liuyunjs/utils/lib/isAnyObject';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 // @ts-ignore
-import { usePresence } from 'framer-motion/dist/es/components/AnimatePresence/use-presence';
+// import { usePresence } from 'framer-motion/dist/es/components/AnimatePresence/use-presence';
+import { usePresence } from 'framer-motion';
 import { BasisConf } from './BasisConf';
 import { ColorConf } from './ColorConf';
-import { ConfRef, AnimationProps, AnimationConf, WithConf } from './types';
-import { isTransform, isColor } from './utils';
+import { ConfRef, RMotionProps, WithConf } from './types';
+import { isTransform, isColor, maybeToArr } from './utils';
 
-const { block, useCode, cond, call, Value, add, set, eq, onChange } = Animated;
-
-export function rmotion<T>(Component: React.ComponentType<T>) {
+export function rmotion<T extends object>(Component: React.ComponentType<T>) {
   // @ts-ignore
   const AnimatedComponent = Animated.createAnimatedComponent(Component);
-  const Motion = React.forwardRef<any, T & AnimationProps>(function Motion(
-    {
-      from,
-      animate,
-      exit,
-      config,
-      style,
-      motionRef,
-      onDidAnimate,
-      onWillAnimate,
-      ...rest
-    },
-    ref,
-  ) {
-    const confRef = React.useRef<ConfRef>();
-    const prevRef = React.useRef<{ value: AnimationConf; dep: any }>();
-    const animStyle = React.useRef<any>({}).current;
-    const [isPresent, safeToUnmount] = usePresence();
 
-    const hasExitStyle =
-      !!exit && typeof exit === 'object' && !!Object.keys(exit).length;
-
-    let conf = confRef.current;
-
-    if (isPresent || !hasExitStyle) {
-      if (
-        !prevRef.current ||
-        (animate && !equal(animate, prevRef.current.value, 4))
-      ) {
-        prevRef.current = { value: animate!, dep: [] };
-        processor(animate!);
-      }
-    }
-
-    React.useMemo(() => {
-      if (!isPresent && hasExitStyle) {
-        prevRef.current!.dep = [];
-        processor(exit!);
-      }
-      //  eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isPresent, hasExitStyle]);
-
-    function createAndUpdateStyle(
-      key: string,
-      animValue: number | WithConf<number>,
-    ) {
-      conf![key] = isColor(key)
-        ? new ColorConf(animValue)
-        : new BasisConf(animValue);
-
-      if (isTransform(key)) {
-        if (!animStyle.transform) animStyle.transform = [];
-        animStyle.transform.push({ [key]: conf![key].value });
-      } else {
-        animStyle[key] = conf![key].value;
-      }
-    }
-
-    function processor(animConf: AnimationConf) {
-      const currentAnim = animConf
-        ? Array.isArray(animConf)
-          ? animConf
-          : [animConf]
-        : [];
-      if (!conf) {
-        conf = confRef.current = {};
-        if (from) currentAnim.unshift(from);
-      } else {
-        for (let key in conf) {
-          if (!conf.hasOwnProperty(key)) continue;
-          conf[key].clear();
-        }
-      }
-
-      for (let i = 0, len = currentAnim.length; i < len; i++) {
-        const { config: confItem, ...restAnim } = currentAnim[i];
-        for (let key in restAnim) {
-          if (!restAnim.hasOwnProperty(key)) continue;
-          const animItem = restAnim[key];
-          if (animItem == null) continue;
-          if (!conf[key]) {
-            if (Array.isArray(animItem)) {
-              if (!animItem.length) continue;
-              createAndUpdateStyle(key, animItem[0]);
-
-              for (let k = 1, aLen = animItem.length; k < aLen; k++) {
-                conf[key].add(animItem[k], confItem, config);
-              }
-            } else {
-              createAndUpdateStyle(key, animItem);
-            }
-          } else {
-            if (Array.isArray(animItem)) {
-              for (let k = 0, aLen = animItem.length; k < aLen; k++) {
-                conf[key].add(animItem[k], confItem, config);
-              }
-            } else {
-              conf[key].add(animItem, confItem, config);
-            }
-          }
-        }
-      }
-    }
-
-    React.useEffect(
-      function () {
-        if (!isPresent && !hasExitStyle) {
-          safeToUnmount?.();
-        }
+  const Motion = React.forwardRef<any, Animated.AnimateProps<T> & RMotionProps>(
+    function Motion(
+      {
+        from,
+        animate,
+        exit,
+        config,
+        //@ts-ignore
+        style,
+        motionRef,
+        onDidAnimate,
+        onWillAnimate,
+        ...rest
       },
-      [hasExitStyle, isPresent, safeToUnmount],
-    );
+      ref,
+    ) {
+      const confRef = React.useRef<ConfRef>();
+      const prevRef = React.useRef<{ value: any; dep: any }>();
+      const animStyle = React.useRef<any>({}).current;
+      const [isPresent, safeToUnmount] = usePresence();
 
-    React.useImperativeHandle(motionRef, () => conf!);
+      const hasExitStyle =
+        !!exit && isAnyObject(exit) && !!Object.keys(exit).length;
 
-    useCode(() => {
-      const nodes: Animated.Node<any>[] = [];
-
-      for (let key in conf) {
-        if (!conf.hasOwnProperty(key)) continue;
-        const node = conf[key].start();
-        if (node) nodes.push(node);
+      let conf = confRef.current!;
+      if (isPresent || !hasExitStyle) {
+        if (
+          !prevRef.current ||
+          (animate && !equal(animate, prevRef.current.value))
+        ) {
+          prevRef.current = { value: animate!, dep: [] };
+          processor(animate);
+        }
+      } else {
+        prevRef.current!.dep = [];
+        processor(exit);
       }
 
-      const len = nodes.length;
-      if (!len) return;
+      function createAndUpdateStyle(key: string, animValue: WithConf<number>) {
+        conf[key] = isColor(key)
+          ? new ColorConf(animValue)
+          : new BasisConf(animValue);
 
-      onWillAnimate?.(!isPresent);
+        if (isTransform(key)) {
+          if (!animStyle.transform) animStyle.transform = [];
+          animStyle.transform.push({ [key]: conf![key].value });
+        } else {
+          animStyle[key] = conf![key].value;
+        }
+      }
 
-      const total = new Value(0);
+      function processor(animConf: any) {
+        animConf = JSON.parse(JSON.stringify(animConf));
+        if (!conf) {
+          conf = confRef.current = {};
+          if (from) {
+            Object.keys(from).forEach((key) => {
+              if (animConf[key]) {
+                animConf[key] = maybeToArr(animConf[key]);
+                animConf[key].unshift((from as any)[key]);
+              } else {
+                animConf[key] = (from as any)[key];
+              }
+            });
+          }
+        } else {
+          Object.keys(conf).forEach((key) => {
+            conf[key].clear();
+          });
+        }
 
-      return block([
-        block(nodes.map((node) => onChange(node, set(total, add(total, 1))))),
-        cond(
-          eq(total, len),
-          call([total], () => {
-            if (!isPresent) safeToUnmount?.();
-            onDidAnimate?.(!isPresent);
-          }),
-        ),
-      ]);
-    }, [prevRef.current!.dep]);
+        Object.keys(animConf).forEach((key) => {
+          const current = maybeToArr(animConf[key]);
+          let i = 0;
+          if (!conf[key]) {
+            createAndUpdateStyle(key, current[0]);
+            i++;
+          }
+          for (let aLen = current.length; i < aLen; i++) {
+            conf[key].add(current[i], config);
+          }
+        });
+      }
 
-    return <AnimatedComponent {...rest} ref={ref} style={[style, animStyle]} />;
-  });
+      React.useEffect(
+        function () {
+          if (!isPresent && !hasExitStyle) {
+            safeToUnmount?.();
+          }
+        },
+        [hasExitStyle, isPresent, safeToUnmount],
+      );
+
+      React.useImperativeHandle(motionRef, () => confRef.current!, []);
+
+      useCode(() => {
+        const nodes: Animated.Node<any>[] = [];
+
+        Object.keys(conf!).forEach((key) => {
+          const node = conf![key].start();
+          if (node) nodes.push(node);
+        });
+
+        const len = nodes.length;
+        if (!len) return;
+
+        onWillAnimate?.(!isPresent);
+
+        const total = new Value(0);
+
+        return block([
+          block(nodes.map((node) => onChange(node, set(total, add(total, 1))))),
+          cond(
+            eq(total, len),
+            call([total], () => {
+              if (!isPresent) safeToUnmount?.();
+              onDidAnimate?.(!isPresent);
+            }),
+          ),
+        ]);
+      }, [prevRef.current!.dep]);
+
+      return (
+        <AnimatedComponent
+          {...(rest as any)}
+          ref={ref}
+          style={[style, animStyle]}
+        />
+      );
+    },
+  );
 
   Motion.displayName = `rmotion(${
     Component.displayName || Component.name || 'Component'

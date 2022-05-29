@@ -1,7 +1,4 @@
-import Animated from 'react-native-reanimated';
-import { WithConf } from './types';
-
-const {
+import Animated, {
   Value,
   Clock,
   set,
@@ -11,7 +8,9 @@ const {
   stopClock,
   startClock,
   clockRunning,
-} = Animated;
+} from 'react-native-reanimated';
+import { isAnyObject } from '@liuyunjs/utils/lib/isAnyObject';
+import { WithConf } from './types';
 
 export class BasisConfItem<Config> {
   protected readonly _finished = new Value(0);
@@ -20,7 +19,6 @@ export class BasisConfItem<Config> {
   protected readonly _clock = new Clock();
 
   protected readonly _toValue: Animated.Adaptable<number>;
-  protected readonly _localConf?: Config;
   protected readonly _globalConf?: Config;
   protected readonly _currentConf?: Config;
   protected readonly _defaultConf!: Required<Omit<Config, 'type'>>;
@@ -31,28 +29,30 @@ export class BasisConfItem<Config> {
   constructor(
     position: Animated.Value<number>,
     anim: WithConf<number, Config>,
-    localConf?: Config,
     globalConf?: Config,
   ) {
+    const conf = isAnyObject(anim) ? anim : { value: anim };
+
     this._position = position;
-    this._toValue = anim.value;
-    this._currentConf = anim.config;
-    this._localConf = localConf;
+    this._toValue = (conf as any).value;
+    this._currentConf = (conf as any).config;
     this._globalConf = globalConf;
   }
 
   protected _getConf(): Required<Omit<Config, 'type'>> & {
-    toValue: Animated.Value<number>;
+    toValue: Animated.Adaptable<number>;
   } {
     const config = Object.assign(
       {},
       this._defaultConf,
       this._globalConf,
-      this._localConf,
       this._currentConf,
     );
+    // @ts-ignore
     delete config.type;
+    // @ts-ignore
     config.toValue = this._toValue;
+    // @ts-ignore
     return config;
   }
 

@@ -1,5 +1,6 @@
 import { processColor } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, { color, block } from 'react-native-reanimated';
+import { isAnyObject } from '@liuyunjs/utils/lib/isAnyObject';
 import { BasisConf } from './BasisConf';
 import { OneOfAnimConf, WithConf } from './types';
 
@@ -31,8 +32,6 @@ const parseValue = (
   return processColor(startValue.value) as number;
 };
 
-const { color, block } = Animated;
-
 export class ColorConf {
   readonly value: Animated.Node<number | string>;
 
@@ -41,9 +40,7 @@ export class ColorConf {
   private readonly _b: BasisConf;
   private readonly _a: BasisConf;
 
-  constructor(
-    startValue: number | WithConf<number> | string | WithConf<string>,
-  ) {
+  constructor(startValue: WithConf<number> | WithConf<string>) {
     const value = parseValue(startValue);
 
     this._r = new BasisConf(red(value));
@@ -61,11 +58,9 @@ export class ColorConf {
 
   add(
     value: number | WithConf<number> | string | WithConf<string>,
-    localConf?: OneOfAnimConf,
     globalConf?: OneOfAnimConf,
   ) {
-    const currentConf =
-      value && typeof value === 'object' ? value.config : undefined;
+    const currentConf = isAnyObject(value) ? (value as any).config : undefined;
     const val = parseValue(value);
 
     this._r.add(
@@ -73,7 +68,6 @@ export class ColorConf {
         value: red(val),
         config: currentConf,
       },
-      localConf,
       globalConf,
     );
     this._g.add(
@@ -81,7 +75,6 @@ export class ColorConf {
         value: green(val),
         config: currentConf,
       },
-      localConf,
       globalConf,
     );
     this._b.add(
@@ -89,7 +82,6 @@ export class ColorConf {
         value: blue(val),
         config: currentConf,
       },
-      localConf,
       globalConf,
     );
     this._a.add(
@@ -97,7 +89,6 @@ export class ColorConf {
         value: opacity(val),
         config: currentConf,
       },
-      localConf,
       globalConf,
     );
   }

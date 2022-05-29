@@ -1,8 +1,11 @@
-import Animated, { Easing, EasingNode } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  EasingNode,
+  Value,
+  timing,
+} from 'react-native-reanimated';
 import { BasisConfItem } from './BasisConfItem';
 import { TimingAnimConf } from './types';
-
-const { Value, timing } = Animated;
 
 export class TimingConfItem extends BasisConfItem<TimingAnimConf> {
   private readonly _frameTime = new Value(0);

@@ -1,8 +1,6 @@
-import Animated from 'react-native-reanimated';
+import Animated, { Value, spring } from 'react-native-reanimated';
 import { BasisConfItem } from './BasisConfItem';
 import { SpringAnimConf } from './types';
-
-const { Value, spring } = Animated;
 
 export class SpringConfItem extends BasisConfItem<SpringAnimConf> {
   private readonly _velocity = new Value(0);
