@@ -1,10 +1,8 @@
 const createIs = (arr: string[]) => (styleKey: string) =>
   arr.indexOf(styleKey) !== -1;
 
-export function maybeToArr<T>(val: T | T[]) {
-  if (Array.isArray(val)) return val;
-  return [val];
-}
+export const maybeToArr = <T>(val: T | T[]) =>
+  Array.isArray(val) ? val : [val];
 
 export const isTransform = createIs([
   'perspective',

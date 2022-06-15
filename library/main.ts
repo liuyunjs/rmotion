@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { View, Image, Text } from 'react-native';
-
-// @ts-ignore
-// import { AnimatePresence as AP } from 'framer-motion/dist/es/components/AnimatePresence';
+import Animated from 'react-native-reanimated';
 import { AnimatePresence as AP } from 'framer-motion';
 import { rmotion } from './rmotion';
 import { AnimatePresenceProps } from './types';

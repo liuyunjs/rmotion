@@ -27,12 +27,12 @@ export class BasisConf {
     this._items = [];
   }
 
-  start() {
+  start(): Animated.Adaptable<any> {
     return this._items.reduceRight(
       (previousValue: Animated.Adaptable<any>, currentValue) => {
         return currentValue.anim(previousValue);
       },
-      0,
+      1,
     );
   }
 }

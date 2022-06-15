@@ -1,5 +1,5 @@
 import { processColor } from 'react-native';
-import Animated, { color, block } from 'react-native-reanimated';
+import Animated, { color, and, block } from 'react-native-reanimated';
 import { isAnyObject } from '@liuyunjs/utils/lib/isAnyObject';
 import { BasisConf } from './BasisConf';
 import { OneOfAnimConf, WithConf } from './types';

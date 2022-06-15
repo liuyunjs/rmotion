@@ -1,8 +1,6 @@
 import Animated, {
   Value,
   Clock,
-  set,
-  block,
   cond,
   not,
   stopClock,
@@ -57,21 +55,14 @@ export class BasisConfItem<Config> {
   }
 
   anim(node: Animated.Adaptable<any>) {
-    return block([
-      cond(not(this._finished), [
-        cond(not(clockRunning(this._clock)), [
-          set(this._finished, 0),
-          set(this._time, 0),
-          startClock(this._clock),
-        ]),
-        this._getAnimNode(),
-      ]),
-
-      cond(this._finished, [
-        cond(clockRunning(this._clock), stopClock(this._clock)),
-        node,
-      ]),
+    return cond(
       this._finished,
-    ]);
+      [stopClock(this._clock), node],
+      [
+        this._getAnimNode(),
+        cond(not(clockRunning(this._clock)), startClock(this._clock)),
+        0,
+      ],
+    );
   }
 }

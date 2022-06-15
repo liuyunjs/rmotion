@@ -9,42 +9,50 @@
  */
 
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, Button, View } from 'react-native';
-// import { Portal, PortalStore, PortalProvider } from 'react-native-portal-view';
+import { SafeAreaView, StyleSheet, Text, View, Button } from 'react-native';
+import { Portal, DefaultStore } from 'react-native-portal-view';
 import { RMotionView, AnimatePresence } from './library/main';
+
+// DefaultStore.getUpdater('default').setContainer(AnimatePresence);
+//
+// DefaultStore.getUpdater('modal').setContainer(AnimatePresence);
 //
 // const Modal = ({ visible }: { visible: boolean }) => {
 //   return (
-//     visible && (
-//       <Portal key="modal">
-//         <RMotionView
-//           style={[
-//             StyleSheet.absoluteFill,
-//             { backgroundColor: 'rgba(0,0,0,.1)', zIndex: 1 },
-//           ]}
-//           from={{ opacity: 0 }}
-//           animate={{ opacity: [1] }}
-//           exit={{ opacity: 0 }}
-//         />
-//         <RMotionView
-//           exit={{ opacity: 0, translateY: -400 }}
-//           from={{ opacity: 0.3, translateY: 400 }}
-//           animate={{ opacity: 1, translateY: 0 }}
-//           style={[
-//             StyleSheet.absoluteFill,
-//             { height: 400, width: 400, backgroundColor: 'red' },
-//           ]}>
-//           <Text style={[{ fontSize: 20, color: '#fff' }]}>rmotion modal</Text>
-//         </RMotionView>
-//       </Portal>
-//     )
+//     <Portal namespace="modal">
+//       {visible && (
+//         <>
+//           <RMotionView
+//             // config={{ duration: 3000 }}
+//             style={[
+//               StyleSheet.absoluteFill,
+//               { backgroundColor: 'rgba(0,0,0,.1)', zIndex: 1, top: 200 },
+//             ]}
+//             from={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             exit={{ opacity: 0 }}
+//           />
+//           <RMotionView
+//             // onDidAnimate={console.log}
+//             // config={{ duration: 3000 }}
+//             exit={{ opacity: 0, translateY: -400 }}
+//             from={{ opacity: 0.3, translateY: 400 }}
+//             animate={{ opacity: 1, translateY: 0 }}
+//             style={[
+//               StyleSheet.absoluteFill,
+//               { height: 400, width: 400, top: 200 },
+//             ]}>
+//             <Text style={[{ fontSize: 20, color: '#000' }]}>rmotion modal</Text>
+//           </RMotionView>
+//         </>
+//       )}
+//     </Portal>
 //   );
 // };
 //
 // const App = () => {
 //   const [visible, setVisible] = React.useState(false);
-//   const ref = React.useRef();
-//   console.log(11);
+//   const ref = React.useRef<string>();
 //   return (
 //     <SafeAreaView>
 //       <Text onPress={() => setVisible(!visible)} style={{ fontSize: 30 }}>
@@ -53,14 +61,14 @@ import { RMotionView, AnimatePresence } from './library/main';
 //       <Text
 //         onPress={() => {
 //           if (ref.current) {
-//             PortalStore.getUpdater('default').remove(ref.current);
+//             DefaultStore.getUpdater('default').remove(ref.current);
 //             ref.current = undefined;
 //             return;
 //           }
-//           ref.current = PortalStore.getUpdater('default').add(
+//           ref.current = DefaultStore.getUpdater('default').add(
 //             <RMotionView
 //               // config={{ type: 'spring' }}
-//               onDidAnimate={console.log}
+//               // onDidAnimate={console.log}
 //               exit={{ opacity: 0, translateY: -400 }}
 //               from={{ opacity: 0.3, translateY: 400 }}
 //               animate={{ opacity: 1, translateY: 0 }}
@@ -75,7 +83,6 @@ import { RMotionView, AnimatePresence } from './library/main';
 //         show portal
 //       </Text>
 //       <Modal visible={visible} />
-//       <PortalProvider />
 //     </SafeAreaView>
 //   );
 // };
@@ -89,22 +96,29 @@ const App = () => {
       <AnimatePresence>
         {visible && (
           <RMotionView
+            onWillAnimate={(exit) => console.log('onWillAnimate', exit)}
+            onDidAnimate={(exit) => console.log('onDidAnimate', exit)}
             style={{ backgroundColor: 'red' }}
-            from={{ opacity: 0 }}
+            from={{ opacity: 0, translateY: 200 }}
             config={{ duration: 400 }}
             exit={{
-              opacity: 0,
+              opacity: 0.4,
               translateX: 0,
-              translateY: 200,
+              translateY: [
+                // 0,
+                // delay
+                { value: 0, config: { duration: 3000 } },
+                { value: 200, config: { duration: 3000 } },
+              ],
             }}
             animate={{
-              opacity: [0.5, 1],
+              opacity: 1,
               translateY: 0,
               translateX: [
                 0,
                 // delay
                 { value: 0, config: { duration: 3000 } },
-                { value: 200, config: { duration: 1000 } },
+                { value: 200, config: { duration: 3000 } },
               ],
             }}>
             <Text style={{ fontSize: 40 }}>RMotion</Text>

@@ -128,15 +128,23 @@ export type AnimationConf = Animate<ColorStyle, number | string> &
   Animate<TransStyle, number> &
   Animate<BasisStyle, number>;
 
-export type RMotionProps = {
+export type RMotionInternalProps = {
   from?: From<ColorStyle, number | string> &
     From<TransStyle, number> &
     From<BasisStyle, number>;
   animate?: AnimationConf;
-  exit?: AnimationConf;
   config?: OneOfAnimConf;
   children?: React.ReactNode;
-  motionRef?: React.Ref<ConfRef>;
+  onDidAnimate: () => void;
+  onWillAnimate: () => void;
+  forwardRef?: React.Ref<any>;
+};
+
+export type RMotionProps = Omit<
+  RMotionInternalProps,
+  'onDidAnimate' | 'onWillAnimate' | 'forwardRef'
+> & {
+  exit?: AnimationConf;
   onDidAnimate?: (exit: boolean) => void;
   onWillAnimate?: (exit: boolean) => void;
 };

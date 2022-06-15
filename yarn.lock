@@ -3302,7 +3302,7 @@ hey-listen@^1.0.8:
   resolved "https://registry.yarnpkg.com/hey-listen/-/hey-listen-1.0.8.tgz#8e59561ff724908de1aa924ed6ecc84a56a9aa68"
   integrity sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==
 
-hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.2:
+hoist-non-react-statics@*, hoist-non-react-statics@^3.3.0:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz#ece0acaf71d62c2969c2ec59feff42a4b1a85b45"
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
@@ -5513,10 +5513,10 @@ react-native-codegen@^0.0.6:
     jscodeshift "^0.11.0"
     nullthrows "^1.1.1"
 
-react-native-portal-view@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/react-native-portal-view/-/react-native-portal-view-1.0.8.tgz#38a0f7b9d2b8793d822385edcff298db247e6c19"
-  integrity sha512-w8pgJ5ldinrXS5LEMYp82W4ZVHU6UdApMg42dSifEBS7UbXn7Wke0SnpWcicy0w1SGrdurmr+g+ER5wLQhDe7Q==
+react-native-portal-view@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/react-native-portal-view/-/react-native-portal-view-2.0.1.tgz#8a7a6aec2b36e74855a9cd46e7a59f8a4f253f92"
+  integrity sha512-WZq2Zl30H6KHaB/njDNIJblf0Rk0pO1tfoWGbccl9QhrF4wSPBYEOAB1ggXOb+lkQH3RjWsTe4Fuu+FcWJvapg==
 
 react-native-reanimated@^2.2.0:
   version "2.2.0"
