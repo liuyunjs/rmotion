@@ -107,8 +107,8 @@ const App = () => {
               translateY: [
                 // 0,
                 // delay
-                { value: 0, config: { duration: 3000 } },
-                { value: 200, config: { duration: 3000 } },
+                { value: 0, config: { duration: 0.5 } },
+                { value: 200, config: { duration: 0.5 } },
               ],
             }}
             animate={{
@@ -117,8 +117,8 @@ const App = () => {
               translateX: [
                 0,
                 // delay
-                { value: 0, config: { duration: 3000 } },
-                { value: 200, config: { duration: 3000 } },
+                { value: 0, config: { duration: 1 } },
+                { value: 200, config: { duration: 300 } },
               ],
             }}>
             <Text style={{ fontSize: 40 }}>RMotion</Text>

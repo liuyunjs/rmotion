@@ -116,22 +116,20 @@ type BasisStyle = {
   borderStartWidth: number;
 };
 
-type From<Style, T> = Partial<Record<keyof Style, T>>;
-
-type Animate<Style, T> = Partial<Record<keyof Style, MaybeList<WithConf<T>>>>;
+type Animate<Style> = {
+  [P in keyof Style]?: MaybeList<WithConf<Style[P]>>;
+};
 
 export type WithConf<T, C = OneOfAnimConf> = T | { value: T; config?: C };
 
 type MaybeList<T> = T | T[];
 
-export type AnimationConf = Animate<ColorStyle, number | string> &
-  Animate<TransStyle, number> &
-  Animate<BasisStyle, number>;
+export type AnimationConf = Animate<ColorStyle> &
+  Animate<TransStyle> &
+  Animate<BasisStyle>;
 
 export type RMotionInternalProps = {
-  from?: From<ColorStyle, number | string> &
-    From<TransStyle, number> &
-    From<BasisStyle, number>;
+  from?: Partial<ColorStyle> & Partial<TransStyle> & Partial<BasisStyle>;
   animate?: AnimationConf;
   config?: OneOfAnimConf;
   children?: React.ReactNode;

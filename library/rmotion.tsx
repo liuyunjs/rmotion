@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { forwardRef, useLayoutEffect } from 'react';
 import Animated, {
   block,
   cond,
@@ -168,7 +168,7 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
     );
   };
 
-  const Motion = React.forwardRef<any, Animated.AnimateProps<T> & RMotionProps>(
+  const Motion = forwardRef<any, Animated.AnimateProps<T> & RMotionProps>(
     function Motion(
       { animate, exit, onDidAnimate, onWillAnimate, ...rest },
       ref,
@@ -178,7 +178,7 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
       const hasExitStyle =
         !!exit && isAnyObject(exit) && !!Object.keys(exit).length;
 
-      React.useLayoutEffect(
+      useLayoutEffect(
         function () {
           if (!isPresent && !hasExitStyle) {
             safeToUnmount();

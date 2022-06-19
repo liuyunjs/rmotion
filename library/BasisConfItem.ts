@@ -40,11 +40,30 @@ export class BasisConfItem<Config> {
   protected _getConf(): Required<Omit<Config, 'type'>> & {
     toValue: Animated.Adaptable<number>;
   } {
+    const overrideConfig: any = {};
+
+    // 支持 duration 设置为 0 - 1之间的数字解析为百分比
+    if (this._currentConf) {
+      if ('duration' in this._currentConf) {
+        // @ts-ignore
+        const durationRate = this._currentConf.duration;
+
+        if (durationRate <= 1) {
+          const duration: number =
+            // @ts-ignore
+            this._globalConf.duration ?? this._defaultConf.duration;
+
+          overrideConfig.duration = durationRate * duration;
+        }
+      }
+    }
+
     const config = Object.assign(
       {},
       this._defaultConf,
       this._globalConf,
       this._currentConf,
+      overrideConfig,
     );
     // @ts-ignore
     delete config.type;
