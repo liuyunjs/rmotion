@@ -51,7 +51,7 @@ export class BasisConfItem<Config> {
         if (durationRate <= 1) {
           const duration: number =
             // @ts-ignore
-            this._globalConf.duration ?? this._defaultConf.duration;
+            this._globalConf?.duration ?? this._defaultConf.duration;
 
           overrideConfig.duration = durationRate * duration;
         }

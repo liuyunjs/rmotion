@@ -12,7 +12,7 @@ export class TimingConfItem extends BasisConfItem<TimingAnimConf> {
 
   // @ts-ignore
   protected readonly _defaultConf: Required<Omit<TimingAnimConf, 'type'>> = {
-    easing: (EasingNode || Easing).linear,
+    easing: (EasingNode || Easing).ease,
     duration: 300,
   };
 

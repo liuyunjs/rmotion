@@ -120,16 +120,22 @@ type Animate<Style> = {
   [P in keyof Style]?: MaybeList<WithConf<Style[P]>>;
 };
 
+type Override<Style, T> = {
+  [P in keyof Style]?: T;
+};
+
 export type WithConf<T, C = OneOfAnimConf> = T | { value: T; config?: C };
 
 type MaybeList<T> = T | T[];
 
 export type AnimationConf = Animate<ColorStyle> &
-  Animate<TransStyle> &
+  Animate<Override<TransStyle, number>> &
   Animate<BasisStyle>;
 
 export type RMotionInternalProps = {
-  from?: Partial<ColorStyle> & Partial<TransStyle> & Partial<BasisStyle>;
+  from?: Partial<ColorStyle> &
+    Override<TransStyle, number> &
+    Partial<BasisStyle>;
   animate?: AnimationConf;
   config?: OneOfAnimConf;
   children?: React.ReactNode;
