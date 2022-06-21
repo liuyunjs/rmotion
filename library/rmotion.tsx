@@ -22,15 +22,17 @@ import {
   RMotionProps,
   AnimationConf,
   RMotionInternalProps,
+  WithConf,
 } from './types';
-import { isTransform, isColor, maybeToArr } from './utils';
+import { isTransform, isColor, toArray } from './utils';
+import { keys } from './animations/utils';
 
 export function rmotion<T extends object>(Component: React.ComponentType<T>) {
   // @ts-ignore
   const AnimatedComponent = Animated.createAnimatedComponent(Component);
 
   const RMotionInternal: React.FC<RMotionInternalProps> = ({
-    forwardRef,
+    forwardRef: ref,
     from,
     animate,
     config,
@@ -38,6 +40,7 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
     style,
     onDidAnimate,
     onWillAnimate,
+    combineAnimate,
     ...rest
   }) => {
     const constant = useConst<{
@@ -53,53 +56,15 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
     if (animate) {
       // 上次的 animate 跟本次的 animate 不一样需要触发动画
       if (!equal(animate, prevAnimate)) {
+        // 深拷贝一下，保证后面的操作不会修改到原始的 animate
+        const animateCopy: AnimationConf = JSON.parse(JSON.stringify(animate!));
+
+        combineAnimations(animateCopy, prevAnimate);
+
+        parseAnimateIntoNodes(animateCopy);
+
         // 保存本次动画配置，留给下次比对
         constant.prevAnimate = animate!;
-
-        // 深拷贝一下，保证后面的操作不会修改到原始的 animate
-        const animateCopy = JSON.parse(JSON.stringify(animate!));
-        // animateNodes 为 undefined 的时候，说明是首次加载动画
-        if (!animateNodes) {
-          animateNodes = constant.animateNodes = {};
-          // 首次加载动画需要考虑到 from，后续就不管 from
-          if (from) {
-            Object.keys(from).forEach((key) => {
-              /**
-               * 将 from 里面的动画配置拷贝到我们深拷贝的 animate 上去，使 animate 里面的动画配置变成一个数组, 内容如下所示
-               * {
-               *   opacity: [0, 0,5, {value: 1}],
-               * }
-               */
-              if (animateCopy[key] != null) {
-                animateCopy[key] = maybeToArr(animateCopy[key]);
-                animateCopy[key].unshift((from as any)[key]);
-              } else {
-                animateCopy[key] = (from as any)[key];
-              }
-            });
-          }
-        } else {
-          // 不是首次加载动画，把之前的动画节点全部清空
-          Object.keys(animateNodes).forEach((key) => {
-            animateNodes[key].clear();
-          });
-        }
-
-        Object.keys(animateCopy).forEach((key) => {
-          const current = maybeToArr(animateCopy[key]);
-          let i = 0;
-          // 如果是一个全新的动画节点，需要初始化一个对应的 Conf
-          if (!animateNodes[key]) {
-            // 如果是颜色值动画，需要一个特殊处理
-            animateNodes[key] = isColor(key)
-              ? new ColorConf(current[0])
-              : new BasisConf(current[0]);
-            i++;
-          }
-          for (let aLen = current.length; i < aLen; i++) {
-            animateNodes[key].add(current[i], config);
-          }
-        });
 
         updateAnimateStyle();
       }
@@ -108,6 +73,14 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
       // 这样会忽略初始化是没传 animate 但是传了 from 的情况
       constant.animateNodes = constant.animateNodes || {};
     }
+
+    return (
+      <AnimatedComponent
+        {...(rest as any)}
+        ref={ref}
+        style={[style, animStyle]}
+      />
+    );
 
     function updateAnimateStyle() {
       const items = Object.keys(animateNodes).reduce(
@@ -159,13 +132,82 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
       }
     }
 
-    return (
-      <AnimatedComponent
-        {...(rest as any)}
-        ref={forwardRef}
-        style={[style, animStyle]}
-      />
-    );
+    function combineAnimations(
+      current: AnimationConf,
+      previous?: AnimationConf,
+    ) {
+      if (combineAnimate === false || !previous) return;
+      // 如果上次动画是[0, 1]而本次动画是[1,0]; 将本次动画中开始的1删除
+      keys(current).forEach((key) => {
+        if (previous[key]) {
+          const prevAnimateItem = toArray(previous[key]!);
+          const prevAnimateTo = prevAnimateItem[prevAnimateItem.length - 1];
+
+          const nextAnimateItem = ((current[key] as WithConf<
+            string | number
+          >[]) = toArray(current[key]!));
+          const nextAnimateFrom = nextAnimateItem[0];
+          const animateToValue = isAnyObject(prevAnimateTo)
+            ? prevAnimateTo.value
+            : prevAnimateTo;
+          const nextAnimateFromValue = isAnyObject(nextAnimateFrom)
+            ? nextAnimateFrom.value
+            : nextAnimateFrom;
+          if (nextAnimateFromValue === animateToValue) {
+            nextAnimateItem.shift();
+          }
+        }
+      });
+    }
+
+    function parseAnimateIntoNodes(animateCopy: AnimationConf) {
+      // animateNodes 为 undefined 的时候，说明是首次加载动画
+      if (!animateNodes) {
+        animateNodes = constant.animateNodes = {};
+        // 首次加载动画需要考虑到 from，后续就不管 from
+        if (from) {
+          keys(from).forEach((key) => {
+            /**
+             * 将 from 里面的动画配置拷贝到我们深拷贝的 animate 上去，使 animate 里面的动画配置变成一个数组, 内容如下所示
+             * {
+             *   opacity: [0, 0,5, {value: 1}],
+             * }
+             */
+            if (animateCopy[key] != null) {
+              (animateCopy[key] as WithConf<string | number>[]) = toArray(
+                animateCopy[key]!,
+              );
+              (animateCopy[key] as WithConf<number | string>[]).unshift(
+                from[key]!,
+              );
+            } else {
+              animateCopy[key] = (from as any)[key];
+            }
+          });
+        }
+      } else {
+        // 不是首次加载动画，把之前的动画节点全部清空
+        keys(animateNodes).forEach((key) => {
+          animateNodes[key].clear();
+        });
+      }
+
+      keys(animateCopy).forEach((key) => {
+        const current = toArray(animateCopy[key]!);
+        let i = 0;
+        // 如果是一个全新的动画节点，需要初始化一个对应的 Conf
+        if (!animateNodes[key]) {
+          // 如果是颜色值动画，需要一个特殊处理
+          animateNodes[key] = isColor(key)
+            ? new ColorConf(current[0])
+            : new BasisConf(current[0] as WithConf<number>);
+          i++;
+        }
+        for (let aLen = current.length; i < aLen; i++) {
+          animateNodes[key].add(current[i], config);
+        }
+      });
+    }
   };
 
   const Motion = forwardRef<any, Animated.AnimateProps<T> & RMotionProps>(

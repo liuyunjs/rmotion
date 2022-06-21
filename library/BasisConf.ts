@@ -15,7 +15,7 @@ export class BasisConf {
     );
   }
 
-  add(value: WithConf<number>, globalConf?: OneOfAnimConf) {
+  add(value: WithConf<number | string>, globalConf?: OneOfAnimConf) {
     const conf = isAnyObject(value) ? value : { value };
     const confType = (conf as any).config?.type || globalConf?.type;
     const ConfItem = confType === 'spring' ? SpringConfItem : TimingConfItem;

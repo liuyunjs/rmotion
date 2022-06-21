@@ -117,16 +117,16 @@ type BasisStyle = {
 };
 
 type Animate<Style> = {
-  [P in keyof Style]?: MaybeList<WithConf<Style[P]>>;
+  [P in keyof Style]?: MaybeList<WithConf<Exclude<Style[P], undefined>>>;
 };
 
 type Override<Style, T> = {
-  [P in keyof Style]?: T;
+  [P in keyof Style]?: Exclude<T, undefined>;
 };
 
 export type WithConf<T, C = OneOfAnimConf> = T | { value: T; config?: C };
 
-type MaybeList<T> = T | T[];
+export type MaybeList<T> = T | T[];
 
 export type AnimationConf = Animate<ColorStyle> &
   Animate<Override<TransStyle, number>> &
@@ -142,6 +142,7 @@ export type RMotionInternalProps = {
   onDidAnimate: () => void;
   onWillAnimate: () => void;
   forwardRef?: React.Ref<any>;
+  combineAnimate?: boolean;
 };
 
 export type RMotionProps = Omit<

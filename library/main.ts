@@ -4,7 +4,6 @@ import Animated from 'react-native-reanimated';
 import { AnimatePresence as AP } from 'framer-motion';
 import { rmotion } from './rmotion';
 import { AnimatePresenceProps } from './types';
-
 export * from './types';
 
 export const RMotionView = rmotion(View);

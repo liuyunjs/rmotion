@@ -9,9 +9,20 @@
  */
 
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, Button } from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  ScrollView,
+} from 'react-native';
 import { Portal, DefaultStore } from 'react-native-portal-view';
-import { RMotionView, AnimatePresence } from './library/main';
+import { RMotionView, AnimatePresence, animations } from './library/main';
+import * as attentions from './library/animations/attentionSeekers';
+import * as fade from './library/animations/fade';
+import * as bounce from './library/animations/bounce';
+import { keys } from './library/animations/utils';
 
 // DefaultStore.getUpdater('default').setContainer(AnimatePresence);
 //
@@ -87,45 +98,37 @@ import { RMotionView, AnimatePresence } from './library/main';
 //   );
 // };
 
+const animationKeys = keys(bounce);
+
 const App = () => {
+  const [animation, setAnimation] = React.useState<keyof typeof bounce>(
+    animationKeys[0],
+  );
   const [visible, setVisible] = React.useState(false);
 
+  console.log('animation', animation);
+
   return (
-    <View style={{ paddingTop: 100 }}>
-      <Button title="toggle" onPress={() => setVisible(!visible)} />
+    <ScrollView style={{ paddingVertical: 44 }}>
+      <Button
+        title="切换"
+        onPress={() => {
+          setVisible(!visible);
+          // const index = animationKeys.indexOf(animation) + 1;
+          // setAnimation(animationKeys[index % animationKeys.length]);
+        }}
+      />
       <AnimatePresence>
         {visible && (
           <RMotionView
-            onWillAnimate={(exit) => console.log('onWillAnimate', exit)}
-            onDidAnimate={(exit) => console.log('onDidAnimate', exit)}
-            style={{ backgroundColor: 'red' }}
-            from={{ opacity: 0, translateY: 200 }}
-            config={{ duration: 400 }}
-            exit={{
-              opacity: 0.4,
-              translateX: 0,
-              translateY: [
-                // 0,
-                // delay
-                { value: 0, config: { duration: 0.5 } },
-                { value: 200, config: { duration: 0.5 } },
-              ],
-            }}
-            animate={{
-              opacity: 1,
-              translateY: 0,
-              translateX: [
-                0,
-                // delay
-                { value: 0, config: { duration: 1 } },
-                { value: 200, config: { duration: 300 } },
-              ],
-            }}>
+            style={{ backgroundColor: 'red', marginVertical: 10 }}
+            animate={animations.slideUpIn}
+            exit={animations.slideUpOut}>
             <Text style={{ fontSize: 40 }}>RMotion</Text>
           </RMotionView>
         )}
       </AnimatePresence>
-    </View>
+    </ScrollView>
   );
 };
 

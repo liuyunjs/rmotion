@@ -1,8 +1,11 @@
+import { WithConf, MaybeList } from './types';
+
 const createIs = (arr: string[]) => (styleKey: string) =>
   arr.indexOf(styleKey) !== -1;
 
-export const maybeToArr = <T>(val: T | T[]) =>
-  Array.isArray(val) ? val : [val];
+export const toArray = <T extends unknown>(
+  val: MaybeList<WithConf<T>>,
+): WithConf<T>[] => (Array.isArray(val) ? val : [val]);
 
 export const isTransform = createIs([
   'perspective',

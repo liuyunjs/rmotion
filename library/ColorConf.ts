@@ -1,5 +1,5 @@
 import { processColor } from 'react-native';
-import Animated, { color, and, block } from 'react-native-reanimated';
+import Animated, { color, block } from 'react-native-reanimated';
 import { isAnyObject } from '@liuyunjs/utils/lib/isAnyObject';
 import { BasisConf } from './BasisConf';
 import { OneOfAnimConf, WithConf } from './types';
@@ -18,7 +18,7 @@ function opacity(c: number) {
 }
 
 const parseValue = (
-  startValue: number | WithConf<number> | string | WithConf<string>,
+  startValue: number | WithConf<number | string> | string,
 ) => {
   if (typeof startValue === 'number') {
     return startValue;
@@ -40,7 +40,7 @@ export class ColorConf {
   private readonly _b: BasisConf;
   private readonly _a: BasisConf;
 
-  constructor(startValue: WithConf<number> | WithConf<string>) {
+  constructor(startValue: WithConf<number | string>) {
     const value = parseValue(startValue);
 
     this._r = new BasisConf(red(value));
@@ -57,7 +57,7 @@ export class ColorConf {
   }
 
   add(
-    value: number | WithConf<number> | string | WithConf<string>,
+    value: number | WithConf<number | string> | string,
     globalConf?: OneOfAnimConf,
   ) {
     const currentConf = isAnyObject(value) ? (value as any).config : undefined;
