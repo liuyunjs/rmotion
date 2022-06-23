@@ -26,6 +26,7 @@ import {
 } from './types';
 import { isTransform, isColor, toArray } from './utils';
 import { keys } from './animations/utils';
+import { useSafeCallback } from './useSafeCallback';
 
 export function rmotion<T extends object>(Component: React.ComponentType<T>) {
   // @ts-ignore
@@ -43,6 +44,7 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
     combineAnimate,
     ...rest
   }) => {
+    const safeOnWillAnimate = useSafeCallback(onWillAnimate);
     const constant = useConst<{
       animateNodes: ConfRef;
       prevAnimate: AnimationConf;
@@ -99,7 +101,7 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
       if (len) {
         const total = new Value(0);
 
-        onWillAnimate();
+        safeOnWillAnimate();
 
         items.forEach(([key, node], index) => {
           const val = block([

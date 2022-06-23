@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, Image, Text } from 'react-native';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Animated from 'react-native-reanimated';
 import { AnimatePresence as AP } from 'framer-motion';
 import { rmotion } from './rmotion';

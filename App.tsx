@@ -18,7 +18,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Portal, DefaultStore } from 'react-native-portal-view';
-import { RMotionView, AnimatePresence, animations } from './library/main';
+import { RMotionView, AnimatePresence } from './library/main';
+import * as animations from './library/animations/main';
 import * as attentions from './library/animations/attentionSeekers';
 import * as fade from './library/animations/fade';
 import * as bounce from './library/animations/bounce';
@@ -121,6 +122,7 @@ const App = () => {
       <AnimatePresence>
         {visible && (
           <RMotionView
+            onWillAnimate={(exit) => setVisible(!exit)}
             style={{ backgroundColor: 'red', marginVertical: 10 }}
             animate={animations.slideUpIn}
             exit={animations.slideUpOut}>

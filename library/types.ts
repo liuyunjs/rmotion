@@ -28,18 +28,25 @@ export type TimingAnimConf = Partial<Omit<Animated.TimingConfig, 'toValue'>> & {
 
 export type OneOfAnimConf = SpringAnimConf | TimingAnimConf;
 
-export type TransStyle = PerpectiveTransform &
-  RotateTransform &
-  RotateXTransform &
-  RotateYTransform &
-  RotateZTransform &
-  ScaleTransform &
-  ScaleXTransform &
-  ScaleYTransform &
-  TranslateXTransform &
-  TranslateYTransform &
-  SkewXTransform &
-  SkewYTransform;
+type Override<Style, T> = {
+  [P in keyof Style]: T;
+};
+
+export type TransStyle = Override<
+  PerpectiveTransform &
+    RotateTransform &
+    RotateXTransform &
+    RotateYTransform &
+    RotateZTransform &
+    ScaleTransform &
+    ScaleXTransform &
+    ScaleYTransform &
+    TranslateXTransform &
+    TranslateYTransform &
+    SkewXTransform &
+    SkewYTransform,
+  number
+>;
 
 export type ColorStyle = {
   color: number | string;
@@ -120,22 +127,15 @@ type Animate<Style> = {
   [P in keyof Style]?: MaybeList<WithConf<Exclude<Style[P], undefined>>>;
 };
 
-type Override<Style, T> = {
-  [P in keyof Style]?: Exclude<T, undefined>;
-};
-
 export type WithConf<T, C = OneOfAnimConf> = T | { value: T; config?: C };
 
 export type MaybeList<T> = T | T[];
 
-export type AnimationConf = Animate<ColorStyle> &
-  Animate<Override<TransStyle, number>> &
-  Animate<BasisStyle>;
+type SingleAnimate = ColorStyle & TransStyle & BasisStyle;
+export type AnimationConf = Animate<SingleAnimate>;
 
 export type RMotionInternalProps = {
-  from?: Partial<ColorStyle> &
-    Override<TransStyle, number> &
-    Partial<BasisStyle>;
+  from?: Partial<SingleAnimate>;
   animate?: AnimationConf;
   config?: OneOfAnimConf;
   children?: React.ReactNode;
