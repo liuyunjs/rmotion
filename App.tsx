@@ -105,9 +105,7 @@ const App = () => {
   const [animation, setAnimation] = React.useState<keyof typeof bounce>(
     animationKeys[0],
   );
-  const [visible, setVisible] = React.useState(false);
-
-  console.log('animation', animation);
+  const [visible, setVisible] = React.useState(true);
 
   return (
     <ScrollView style={{ paddingVertical: 44 }}>
@@ -119,17 +117,37 @@ const App = () => {
           // setAnimation(animationKeys[index % animationKeys.length]);
         }}
       />
-      <AnimatePresence>
-        {visible && (
-          <RMotionView
-            onWillAnimate={(exit) => setVisible(!exit)}
-            style={{ backgroundColor: 'red', marginVertical: 10 }}
-            animate={animations.slideUpIn}
-            exit={animations.slideUpOut}>
-            <Text style={{ fontSize: 40 }}>RMotion</Text>
-          </RMotionView>
-        )}
-      </AnimatePresence>
+
+      <RMotionView
+        from={{
+          translateY: 800,
+        }}
+        animate={
+          visible
+            ? {
+                translateY: 0,
+              }
+            : {
+                translateY: 800,
+              }
+        }
+        exit={{
+          translateY: 0,
+        }}
+        style={{ backgroundColor: 'red', width: 300, height: 300 }}
+      />
+
+      {/*<AnimatePresence>*/}
+      {/*  {visible && (*/}
+      {/*    <RMotionView*/}
+      {/*      onWillAnimate={(exit) => setVisible(!exit)}*/}
+      {/*      style={{ backgroundColor: 'red', marginVertical: 10 }}*/}
+      {/*      animate={animations.slideUpIn}*/}
+      {/*      exit={animations.slideUpOut}>*/}
+      {/*      <Text style={{ fontSize: 40 }}>RMotion</Text>*/}
+      {/*    </RMotionView>*/}
+      {/*  )}*/}
+      {/*</AnimatePresence>*/}
     </ScrollView>
   );
 };

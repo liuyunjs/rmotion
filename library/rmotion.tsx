@@ -1,4 +1,4 @@
-import React, { forwardRef, useLayoutEffect } from 'react';
+import React, { forwardRef, useLayoutEffect, FC, ComponentType } from 'react';
 import Animated, {
   block,
   cond,
@@ -13,6 +13,7 @@ import Animated, {
 import { equal } from '@liuyunjs/utils/lib/equal';
 import { isAnyObject } from '@liuyunjs/utils/lib/isAnyObject';
 import { useConst } from '@liuyunjs/hooks/lib/useConst';
+import { useWillMount } from '@liuyunjs/hooks/lib/useWillMount';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import { usePresence } from 'framer-motion';
 import { BasisConf } from './BasisConf';
@@ -28,13 +29,14 @@ import { isTransform, isColor, toArray } from './utils';
 import { keys } from './animations/utils';
 import { useSafeCallback } from './useSafeCallback';
 
-export function rmotion<T extends object>(Component: React.ComponentType<T>) {
+const copy = <T extends object>(data: T): T => JSON.parse(JSON.stringify(data));
+
+export function rmotion<T extends object>(Component: ComponentType<T>) {
   // @ts-ignore
   const AnimatedComponent = Animated.createAnimatedComponent(Component);
 
-  const RMotionInternal: React.FC<RMotionInternalProps> = ({
+  const RMotionInternal: FC<RMotionInternalProps> = ({
     forwardRef: ref,
-    from,
     animate,
     config,
     //@ts-ignore
@@ -47,11 +49,11 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
     const safeOnWillAnimate = useSafeCallback(onWillAnimate);
     const constant = useConst<{
       animateNodes: ConfRef;
-      prevAnimate: AnimationConf;
+      prevAnimate?: AnimationConf;
       animStyle: any;
-      //  @ts-ignore
     }>({
       animStyle: {},
+      animateNodes: {},
     });
     let { animStyle, animateNodes, prevAnimate } = constant;
 
@@ -59,21 +61,14 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
       // 上次的 animate 跟本次的 animate 不一样需要触发动画
       if (!equal(animate, prevAnimate)) {
         // 深拷贝一下，保证后面的操作不会修改到原始的 animate
-        const animateCopy: AnimationConf = JSON.parse(JSON.stringify(animate!));
-
+        const animateCopy = copy(animate!);
         combineAnimations(animateCopy, prevAnimate);
-
         parseAnimateIntoNodes(animateCopy);
-
         // 保存本次动画配置，留给下次比对
         constant.prevAnimate = animate!;
 
         updateAnimateStyle();
       }
-    } else {
-      // 这一步是为了组件初始化的时候如果没有传 animate，也要赋值 animateNodes，animateNodes 赋值了代表组件不是初始化了
-      // 这样会忽略初始化是没传 animate 但是传了 from 的情况
-      constant.animateNodes = constant.animateNodes || {};
     }
 
     return (
@@ -144,10 +139,8 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
         if (previous[key]) {
           const prevAnimateItem = toArray(previous[key]!);
           const prevAnimateTo = prevAnimateItem[prevAnimateItem.length - 1];
-
-          const nextAnimateItem = ((current[key] as WithConf<
-            string | number
-          >[]) = toArray(current[key]!));
+          // @ts-ignore
+          const nextAnimateItem = (current[key] = toArray(current[key]!));
           const nextAnimateFrom = nextAnimateItem[0];
           const animateToValue = isAnyObject(prevAnimateTo)
             ? prevAnimateTo.value
@@ -163,36 +156,9 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
     }
 
     function parseAnimateIntoNodes(animateCopy: AnimationConf) {
-      // animateNodes 为 undefined 的时候，说明是首次加载动画
-      if (!animateNodes) {
-        animateNodes = constant.animateNodes = {};
-        // 首次加载动画需要考虑到 from，后续就不管 from
-        if (from) {
-          keys(from).forEach((key) => {
-            /**
-             * 将 from 里面的动画配置拷贝到我们深拷贝的 animate 上去，使 animate 里面的动画配置变成一个数组, 内容如下所示
-             * {
-             *   opacity: [0, 0,5, {value: 1}],
-             * }
-             */
-            if (animateCopy[key] != null) {
-              (animateCopy[key] as WithConf<string | number>[]) = toArray(
-                animateCopy[key]!,
-              );
-              (animateCopy[key] as WithConf<number | string>[]).unshift(
-                from[key]!,
-              );
-            } else {
-              animateCopy[key] = (from as any)[key];
-            }
-          });
-        }
-      } else {
-        // 不是首次加载动画，把之前的动画节点全部清空
-        keys(animateNodes).forEach((key) => {
-          animateNodes[key].clear();
-        });
-      }
+      keys(animateNodes).forEach((key) => {
+        animateNodes[key].clear();
+      });
 
       keys(animateCopy).forEach((key) => {
         const current = toArray(animateCopy[key]!);
@@ -212,43 +178,65 @@ export function rmotion<T extends object>(Component: React.ComponentType<T>) {
     }
   };
 
-  const Motion = forwardRef<any, Animated.AnimateProps<T> & RMotionProps>(
-    function Motion(
-      { animate, exit, onDidAnimate, onWillAnimate, ...rest },
-      ref,
-    ) {
-      const [isPresent, safeToUnmount] = usePresence();
+  const Motion = forwardRef<any, T & RMotionProps>(function Motion(
+    { animate, exit, onDidAnimate, onWillAnimate, from, ...rest },
+    ref,
+  ) {
+    // 首次加载动画需要考虑到 from，后续就不管 from
+    useWillMount(() => {
+      if (from && animate) {
+        animate = copy(animate!);
+        keys(from).forEach((key) => {
+          /**
+           * 将 from 里面的动画配置拷贝到我们深拷贝的 animate 上去，使 animate 里面的动画配置变成一个数组, 内容如下所示
+           * {
+           *   opacity: [0, 0,5, {value: 1}],
+           * }
+           */
+          if (animate![key] != null) {
+            // @ts-ignore
+            animate![key] = toArray(animate![key]!);
+            // @ts-ignore
+            animate![key].unshift(from[key]!);
+          } else {
+            // @ts-ignore
+            animate![key] = from[key];
+          }
+        });
+      }
+    });
 
-      const hasExitStyle =
-        !!exit && isAnyObject(exit) && !!Object.keys(exit).length;
+    const [isPresent, safeToUnmount] = usePresence();
 
-      useLayoutEffect(
-        function () {
-          if (!isPresent && !hasExitStyle) {
+    const hasExitStyle =
+      !!exit && isAnyObject(exit) && !!Object.keys(exit).length;
+
+    useLayoutEffect(
+      function () {
+        if (!isPresent && !hasExitStyle) {
+          safeToUnmount();
+        }
+      },
+      [hasExitStyle, isPresent, safeToUnmount],
+    );
+
+    return (
+      <RMotionInternal
+        {...rest}
+        onDidAnimate={() => {
+          onDidAnimate?.(!isPresent);
+          if (!isPresent) {
             safeToUnmount();
           }
-        },
-        [hasExitStyle, isPresent, safeToUnmount],
-      );
-
-      return (
-        <RMotionInternal
-          {...rest}
-          onDidAnimate={() => {
-            onDidAnimate?.(!isPresent);
-            if (!isPresent) {
-              safeToUnmount();
-            }
-          }}
-          onWillAnimate={() => {
-            onWillAnimate?.(!isPresent);
-          }}
-          animate={isPresent ? animate : exit}
-          forwardRef={ref}
-        />
-      );
-    },
-  );
+        }}
+        onWillAnimate={() => {
+          onWillAnimate?.(!isPresent);
+        }}
+        animate={isPresent ? animate : exit}
+        forwardRef={ref}
+      />
+    );
+  });
 
   Motion.displayName = `rmotion(RMotion${
     Component.displayName || Component.name || 'Component'

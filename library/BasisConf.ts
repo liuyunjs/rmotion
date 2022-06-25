@@ -11,13 +11,13 @@ export class BasisConf {
 
   constructor(startValue: WithConf<number>) {
     this.value = new Value<number>(
-      typeof startValue === 'object' ? startValue.value : startValue,
+      isAnyObject(startValue) ? startValue.value : startValue,
     );
   }
 
   add(value: WithConf<number | string>, globalConf?: OneOfAnimConf) {
     const conf = isAnyObject(value) ? value : { value };
-    const confType = (conf as any).config?.type || globalConf?.type;
+    const confType = conf.config?.type || globalConf?.type;
     const ConfItem = confType === 'spring' ? SpringConfItem : TimingConfItem;
     // @ts-ignore
     this._items.push(new ConfItem(this.value, conf, globalConf));

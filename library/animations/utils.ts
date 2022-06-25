@@ -7,10 +7,7 @@ export const easingIn = E.in(E.ease);
 export const easingOut = E.in(E.ease);
 export const zoomEasing =  E.bezier(0.175, 0.885, 0.32, 1);
 
-export const radian = <T = number>(deg: T): T => {
-  //  @ts-ignore
-  return Math.PI * (parseFloat(deg) / 180);
-};
+export const radian = (deg: number) => Math.PI * (deg / 180)
 
 export const adjustTranslate = (
   translation: { translateY: number } | { translateX: number },
@@ -61,9 +58,7 @@ export const defineTimingAnimate = (
   easing?: (t: Animated.Adaptable<number>) => Animated.Node<number>,
 ) => {
   return items.map((item) => {
-    if (isNumber(item)) {
-      return item as number;
-    }
+    if (isNumber(item)) return item;
     return defineTimingAnimateItem(item[0], item[1]!, easing);
   });
 };

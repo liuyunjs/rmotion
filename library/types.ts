@@ -124,18 +124,17 @@ type BasisStyle = {
 };
 
 type Animate<Style> = {
-  [P in keyof Style]?: MaybeList<WithConf<Exclude<Style[P], undefined>>>;
+  [P in keyof Style]?: MaybeList<WithConf<Style[P]>>;
 };
 
 export type WithConf<T, C = OneOfAnimConf> = T | { value: T; config?: C };
 
 export type MaybeList<T> = T | T[];
 
-type SingleAnimate = ColorStyle & TransStyle & BasisStyle;
-export type AnimationConf = Animate<SingleAnimate>;
+type AnimateStyle = ColorStyle & TransStyle & BasisStyle;
+export type AnimationConf = Animate<AnimateStyle>;
 
 export type RMotionInternalProps = {
-  from?: Partial<SingleAnimate>;
   animate?: AnimationConf;
   config?: OneOfAnimConf;
   children?: React.ReactNode;
@@ -147,12 +146,22 @@ export type RMotionInternalProps = {
 
 export type RMotionProps = Omit<
   RMotionInternalProps,
-  'onDidAnimate' | 'onWillAnimate' | 'forwardRef'
+  'onDidAnimate' | 'onWillAnimate' | 'forwardRef' | 'animate'
 > & {
-  exit?: AnimationConf;
   onDidAnimate?: (exit: boolean) => void;
   onWillAnimate?: (exit: boolean) => void;
-};
+} & (
+    | {
+        exit?: AnimationConf;
+        animate?: AnimationConf;
+        from?: undefined;
+      }
+    | {
+        from: Partial<AnimateStyle>;
+        animate?: Partial<AnimateStyle>;
+        exit?: Partial<AnimateStyle>;
+      }
+  );
 
 export type AnimationProps = RMotionProps;
 
