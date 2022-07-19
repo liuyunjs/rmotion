@@ -137,7 +137,6 @@ export function keyframes<T extends object>(Component: React.ComponentType<T>) {
 
         rangeKeys.forEach((key, index) => {
           const { input, output } = ranges[key];
-          console.log(key, input, output);
           if (input.length < 2) {
             throw new Error(`动画 ${key} 必须定义2帧及以上`);
           }
@@ -194,7 +193,6 @@ export function keyframes<T extends object>(Component: React.ComponentType<T>) {
               cond(finished, [
                 stopClock(clock),
                 call([position], ([p]) => {
-                  console.log('position', p);
                   onDidAnimate?.();
                 }),
               ]),
