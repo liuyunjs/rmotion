@@ -1,17 +1,75 @@
-import { AnimationConf } from '../types';
-import { defineTimingAnimate, radian, easingIn, easingOut } from './utils';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import Animated from 'react-native-reanimated';
+import { easingIn, easingOut } from './utils';
 
-export const lightSpeedIn: AnimationConf = {
-  opacity: defineTimingAnimate([0, [1, 0.6]], easingOut),
-  translateX: defineTimingAnimate([200, [0, 0.6]], easingOut),
-  skewX: defineTimingAnimate(
-    [radian(30), [radian(20), 0.6], [radian(-5), 0.2], [radian(0), 0.2]],
-    easingOut,
-  ),
+export const lightSpeedInRight = {
+  easing: easingOut,
+  0: {
+    opacity: 0,
+    translateX: 200,
+    skewX: '-30deg',
+  },
+  0.6: {
+    opacity: 1,
+    translateX: 0,
+    skewX: '-20deg',
+  },
+  0.8: {
+    skewX: '-5deg',
+  },
+  1: {
+    opacity: 1,
+    translateX: 0,
+    skewX: '0deg',
+  },
 };
 
-export const lightSpeedOut: AnimationConf = {
-  opacity: defineTimingAnimate([1, [0, 1]], easingIn),
-  translateX: defineTimingAnimate([0, [200, 1]], easingIn),
-  skewX: defineTimingAnimate([radian(0), [radian(30), 1]], easingIn),
+export const lightSpeedInLeft = {
+  easing: easingOut,
+  0: {
+    opacity: 0,
+    translateX: -200,
+    skewX: '30deg',
+  },
+  0.6: {
+    opacity: 1,
+    translateX: 0,
+    skewX: '20deg',
+  },
+  0.8: {
+    skewX: '5deg',
+  },
+  1: {
+    opacity: 1,
+    translateX: 0,
+    skewX: '0deg',
+  },
+};
+
+export const lightSpeedOutRight = {
+  easing: easingIn,
+  0: {
+    opacity: 1,
+    translateX: 0,
+    skewX: '0deg',
+  },
+  1: {
+    opacity: 0,
+    translateX: 200,
+    skewX: '-30deg',
+  },
+};
+
+export const lightSpeedOutLeft = {
+  easing: easingIn,
+  0: {
+    opacity: 1,
+    translateX: 0,
+    skewX: '0deg',
+  },
+  1: {
+    opacity: 0,
+    translateX: -200,
+    skewX: '30deg',
+  },
 };

@@ -1,143 +1,283 @@
-import { defineTimingAnimate, radian } from './utils';
+import { KeyframesAnimate } from '../types';
 
-export const bounce = {
-  translateY: defineTimingAnimate([
-    0,
-    [0, 0.2],
-    [-30, 0.2],
-    [-30, 0.03],
-    [0, 0.1],
-    [-15, 0.17],
-    [0, 0.1],
-    [-4, 0.1],
-    [0, 0.1],
-  ]),
+export const bounce: KeyframesAnimate = {
+  0: {
+    translateY: 0,
+  },
+  0.2: {
+    translateY: 0,
+  },
+  0.4: {
+    translateY: -30,
+  },
+  0.43: {
+    translateY: -30,
+  },
+  0.53: {
+    translateY: 0,
+  },
+  0.7: {
+    translateY: -15,
+  },
+  0.8: {
+    translateY: 0,
+  },
+  0.9: {
+    translateY: -4,
+  },
+  1: {
+    translateY: 0,
+  },
 };
 
-export const flash = {
-  opacity: defineTimingAnimate([0, [0, 0.25], [1, 0.25], [0, 0.25], [1, 0.25]]),
+export const flash: KeyframesAnimate = {
+  0: {
+    opacity: 1,
+  },
+  0.25: {
+    opacity: 0,
+  },
+  0.5: {
+    opacity: 1,
+  },
+  0.75: {
+    opacity: 0,
+  },
+  1: {
+    opacity: 1,
+  },
 };
 
-const jelloSkew = defineTimingAnimate([
-  0,
-  [radian(0), 0.111],
-  [radian(-12.5), 0.111],
-  [radian(6.25), 0.111],
-  [radian(-3.125), 0.111],
-  [radian(1.5625), 0.111],
-  [radian(-0.78125), 0.111],
-  [radian(0.390625), 0.111],
-  [radian(-0.1953125), 0.111],
-  [radian(0), 0.112],
-]);
-
-export const jello = {
-  skewX: jelloSkew,
-  skewY: jelloSkew,
+export const jello: KeyframesAnimate = {
+  0: {
+    skewX: '0deg',
+    skewY: '0deg',
+  },
+  0.111: {
+    skewX: '0deg',
+    skewY: '0deg',
+  },
+  0.222: {
+    skewX: '12.5deg',
+    skewY: '12.5deg',
+  },
+  0.333: {
+    skewX: '6.25deg',
+    skewY: '6.25deg',
+  },
+  0.444: {
+    skewX: '-3.125deg',
+    skewY: '-3.125deg',
+  },
+  0.555: {
+    skewX: '1.5625deg',
+    skewY: '1.5625deg',
+  },
+  0.666: {
+    skewX: '-0.78125deg',
+    skewY: '-0.78125deg',
+  },
+  0.777: {
+    skewX: '0.390625deg',
+    skewY: '0.390625deg',
+  },
+  0.888: {
+    skewX: '-0.1953125deg',
+    skewY: '-0.1953125deg',
+  },
+  1: {
+    skewX: '0deg',
+    skewY: '0deg',
+  },
 };
 
-export const pulse = {
-  scale: defineTimingAnimate([1, [1.05, 0.5], [1, 0.5]]),
+export const pulse: KeyframesAnimate = {
+  0: {
+    scale: 1,
+  },
+  0.5: {
+    scale: 1.05,
+  },
+  1: {
+    scale: 1,
+  },
 };
 
-export const rotate = {
-  rotate: defineTimingAnimate([
-    0,
-    [radian(90), 0.25],
-    [radian(180), 0.25],
-    [radian(270), 0.25],
-    [radian(360), 0.25],
-  ]),
+export const rotate: KeyframesAnimate = {
+  0: {
+    rotate: '0deg',
+  },
+  0.25: {
+    rotate: '90deg',
+  },
+  0.5: {
+    rotate: '180deg',
+  },
+  0.75: {
+    rotate: '270deg',
+  },
+  1: {
+    rotate: '360deg',
+  },
 };
 
-export const shake = {
-  translateX: defineTimingAnimate([
-    0,
-    [-10, 0.1],
-    [10, 0.1],
-    [-10, 0.1],
-    [10, 0.1],
-    [-10, 0.1],
-    [10, 0.1],
-    [-10, 0.1],
-    [10, 0.1],
-    [-10, 0.1],
-    [0, 0.1],
-  ]),
+export const shake: KeyframesAnimate = {
+  0: {
+    translateX: 0,
+  },
+  0.1: {
+    translateX: -10,
+  },
+  0.2: {
+    translateX: 10,
+  },
+  0.3: {
+    translateX: -10,
+  },
+  0.4: {
+    translateX: 10,
+  },
+  0.5: {
+    translateX: -10,
+  },
+  0.6: {
+    translateX: 10,
+  },
+  0.7: {
+    translateX: -10,
+  },
+  0.8: {
+    translateX: 10,
+  },
+  0.9: {
+    translateX: -10,
+  },
+  1: {
+    translateX: 0,
+  },
 };
 
-export const swing = {
-  rotate: defineTimingAnimate([
-    0,
-    [radian(15), 0.2],
-    [radian(-10), 0.2],
-    [radian(5), 0.2],
-    [radian(-5), 0.2],
-    [radian(0), 0.2],
-  ]),
+export const swing: KeyframesAnimate = {
+  0: {
+    rotate: '0deg',
+  },
+  0.2: {
+    rotate: '15deg',
+  },
+  0.4: {
+    rotate: '-10deg',
+  },
+  0.6: {
+    rotate: '5deg',
+  },
+  0.8: {
+    rotate: '-5deg',
+  },
+  1: {
+    rotate: '0deg',
+  },
 };
 
-export const rubberBand = {
-  scaleX: defineTimingAnimate([
-    1,
-    [1.25, 0.3],
-    [0.75, 0.1],
-    [1.15, 0.1],
-    [0.95, 0.15],
-    [1.05, 0.1],
-    [1, 0.25],
-  ]),
-  scaleY: defineTimingAnimate([
-    1,
-    [0.75, 0.3],
-    [1.25, 0.1],
-    [0.85, 0.1],
-    [1.05, 0.15],
-    [0.95, 0.1],
-    [1, 0.25],
-  ]),
+export const rubberBand: KeyframesAnimate = {
+  0: {
+    scaleX: 1,
+    scaleY: 1,
+  },
+  0.3: {
+    scaleX: 1.25,
+    scaleY: 0.75,
+  },
+  0.4: {
+    scaleX: 0.75,
+    scaleY: 1.25,
+  },
+  0.5: {
+    scaleX: 1.15,
+    scaleY: 0.85,
+  },
+  0.65: {
+    scaleX: 0.95,
+    scaleY: 1.05,
+  },
+  0.75: {
+    scaleX: 1.05,
+    scaleY: 0.95,
+  },
+  1: {
+    scaleX: 1,
+    scaleY: 1,
+  },
 };
 
-export const tada = {
-  scale: defineTimingAnimate([
-    1,
-    [0.9, 0.1],
-    [0.9, 0.1],
-    [1.1, 0.1],
-    [1.1, 0.6],
-    [1, 0.1],
-  ]),
-  rotate: defineTimingAnimate([
-    0,
-    [radian(-3), 0.1],
-    [radian(-3), 0.2],
-    [radian(3), 0.1],
-    [radian(-3), 0.1],
-    [radian(3), 0.1],
-    [radian(-3), 0.1],
-    [radian(3), 0.1],
-    [radian(3), 0.1],
-    [radian(0), 0.1],
-  ]),
+export const tada: KeyframesAnimate = {
+  0: {
+    scale: 1,
+    rotate: '0deg',
+  },
+  0.1: {
+    scale: 0.9,
+    rotate: '-3deg',
+  },
+  0.2: {
+    scale: 0.9,
+    rotate: '-3deg',
+  },
+  0.3: {
+    scale: 1.1,
+    rotate: '-3deg',
+  },
+  0.4: {
+    rotate: '3deg',
+  },
+  0.5: {
+    rotate: '-3deg',
+  },
+  0.6: {
+    rotate: '3deg',
+  },
+  0.7: {
+    rotate: '-3deg',
+  },
+  0.8: {
+    rotate: '3deg',
+  },
+  0.9: {
+    scale: 1.1,
+    rotate: '3deg',
+  },
+  1: {
+    scale: 1,
+    rotate: '0deg',
+  },
 };
 
-export const wobble = {
-  translateX: defineTimingAnimate([
-    0,
-    [-25, 0.15],
-    [20, 0.15],
-    [-15, 0.15],
-    [10, 0.15],
-    [-5, 0.15],
-    [0, 0.25],
-  ]),
-  rotate: defineTimingAnimate([
-    0,
-    [radian(-5), 0.15],
-    [radian(3), 0.15],
-    [radian(-3), 0.15],
-    [radian(2), 0.15],
-    [radian(-1), 0.15],
-    [radian(0), 0.25],
-  ]),
+export const wobble: KeyframesAnimate = {
+  0: {
+    translateX: 0,
+    rotate: '0deg',
+  },
+  0.15: {
+    translateX: -25,
+    rotate: '-5deg',
+  },
+  0.3: {
+    translateX: 20,
+    rotate: '-3deg',
+  },
+  0.45: {
+    translateX: -15,
+    rotate: '-3deg',
+  },
+  0.6: {
+    translateX: 10,
+    rotate: '2deg',
+  },
+  0.75: {
+    translateX: -5,
+    rotate: '-1deg',
+  },
+  1: {
+    translateX: 0,
+    rotate: '0deg',
+  },
 };

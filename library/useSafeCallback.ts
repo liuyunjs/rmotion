@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import * as React from 'react';
 import { useReactCallback } from '@liuyunjs/hooks/lib/useReactCallback';
 
 export const useSafeCallback = <T extends (...args: any[]) => void>(
@@ -7,7 +7,7 @@ export const useSafeCallback = <T extends (...args: any[]) => void>(
   let safe = false;
   let fn: (() => void) | null = null;
 
-  useLayoutEffect(() => {
+  React.useLayoutEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     safe = true;
     fn?.();

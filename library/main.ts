@@ -1,15 +1,10 @@
-import * as React from 'react';
 import { View, Image, Text } from 'react-native';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import Animated from 'react-native-reanimated';
-import { AnimatePresence as AP } from 'framer-motion';
+export { AnimatePresence } from 'framer-motion';
 import { rmotion } from './rmotion';
-import { AnimatePresenceProps } from './types';
 export * from './types';
+export type { AnimatePresenceProps } from 'framer-motion';
 
 export const RMotionView = rmotion(View);
 export const RMotionImage = rmotion(Image);
 export const RMotionText = rmotion(Text);
 export { rmotion };
-
-export const AnimatePresence = AP as React.FC<AnimatePresenceProps>;

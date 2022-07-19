@@ -1,42 +1,46 @@
-import { Easing, EasingNode } from 'react-native-reanimated';
-import { AnimationConf } from '../types';
-import { defineTimingAnimate, radian, easingIn } from './utils';
+import { AnimateStyle, KeyframesAnimate } from '../types';
 
-export type FlipType = 'X' | 'Y';
+const markFlipAnimation = (
+  axis: 'X' | 'Y',
+  reverse?: boolean,
+): KeyframesAnimate => {
+  const rotateKey = `rotate${axis}` as const;
 
-const markFlipInAnimation = (type: FlipType): AnimationConf => {
-  return {
-    perspective: [400, 400],
-    opacity: defineTimingAnimate([0, [1, 0.6]], easingIn),
-    [`rotate${type}`]: defineTimingAnimate(
-      [
-        radian(90),
-        [radian(-20), 0.4],
-        [radian(10), 0.2],
-        [radian(-5), 0.2],
-        [radian(0), 0.2],
-      ],
-      easingIn,
-    ),
+  const initialValues: Partial<AnimateStyle> = {
+    opacity: 0,
+    [rotateKey]: '90deg',
   };
+
+  const targetValues: Partial<AnimateStyle> = {
+    opacity: 1,
+    [rotateKey]: '0deg',
+  };
+
+  const animation = {
+    style: {
+      perspective: 500,
+    },
+    0: initialValues,
+    1: targetValues,
+  };
+
+  if (reverse) {
+    const from = animation[0];
+    animation[0] = animation[1];
+    animation[1] = from;
+  }
+
+  return animation;
 };
 
-const markFlipOutAnimation = (type: FlipType): AnimationConf => {
-  return {
-    perspective: [400, 400],
-    opacity: defineTimingAnimate([1, [1, 0.3], [0, 0.7]]),
-    [`rotate${type}`]: defineTimingAnimate([
-      radian(0),
-      [radian(-20), 0.3],
-      [radian(90), 0.7],
-    ]),
-  };
-};
-
-export const { flipXIn, flipXOut, flipYOut, flipYIn } = (
+export const { flipInX, flipInY, flipOutX, flipOutY } = (
   ['X', 'Y'] as const
 ).reduce((previousValue, currentValue) => {
-  previousValue[`flip${currentValue}In`] = markFlipInAnimation(currentValue);
-  previousValue[`flip${currentValue}Out`] = markFlipOutAnimation(currentValue);
+  previousValue[`flipIn${currentValue}`] = markFlipAnimation(currentValue);
+  previousValue[`flipOut${currentValue}`] = markFlipAnimation(
+    currentValue,
+    true,
+  );
+
   return previousValue;
-}, {} as Record<`flip${FlipType}In` | `flip${FlipType}Out`, AnimationConf>);
+}, {} as Record<`flip${'Out' | 'In'}${'X' | 'Y'}`, KeyframesAnimate>);

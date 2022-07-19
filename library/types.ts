@@ -14,17 +14,22 @@ import {
   TranslateYTransform,
 } from 'react-native';
 import * as React from 'react';
-import type { AnimatePresenceProps } from 'framer-motion';
 import { BasisConf } from './BasisConf';
 import { ColorConf } from './ColorConf';
 
-export type SpringAnimConf = Partial<Omit<Animated.SpringConfig, 'toValue'>> & {
-  type: 'spring';
-};
+export type SpringAnimConf = Partial<
+  Override<Omit<Animated.TimingConfig, 'toValue'>, undefined>
+> &
+  Partial<Omit<Animated.SpringConfig, 'toValue'>> & {
+    type: 'spring';
+  };
 
-export type TimingAnimConf = Partial<Omit<Animated.TimingConfig, 'toValue'>> & {
-  type?: 'timing';
-};
+export type TimingAnimConf = Partial<
+  Override<Omit<Animated.SpringConfig, 'toValue'>, undefined>
+> &
+  Partial<Omit<Animated.TimingConfig, 'toValue'>> & {
+    type?: 'timing';
+  };
 
 export type OneOfAnimConf = SpringAnimConf | TimingAnimConf;
 
@@ -32,21 +37,21 @@ type Override<Style, T> = {
   [P in keyof Style]: T;
 };
 
-export type TransStyle = Override<
+export type TransStyle = ScaleTransform &
+  ScaleXTransform &
+  ScaleYTransform &
+  TranslateXTransform &
+  TranslateYTransform &
   PerpectiveTransform &
+  Override<
     RotateTransform &
-    RotateXTransform &
-    RotateYTransform &
-    RotateZTransform &
-    ScaleTransform &
-    ScaleXTransform &
-    ScaleYTransform &
-    TranslateXTransform &
-    TranslateYTransform &
-    SkewXTransform &
-    SkewYTransform,
-  number
->;
+      RotateXTransform &
+      RotateYTransform &
+      RotateZTransform &
+      SkewXTransform &
+      SkewYTransform,
+    number | string
+  >;
 
 export type ColorStyle = {
   color: number | string;
@@ -131,17 +136,23 @@ export type WithConf<T, C = OneOfAnimConf> = T | { value: T; config?: C };
 
 export type MaybeList<T> = T | T[];
 
-type AnimateStyle = ColorStyle & TransStyle & BasisStyle;
+export type AnimateStyle = ColorStyle & TransStyle & BasisStyle;
 export type AnimationConf = Animate<AnimateStyle>;
 
-export type RMotionInternalProps = {
-  animate?: AnimationConf;
-  config?: OneOfAnimConf;
+export type KeyframesAnimate = {
+  [key: number]: Partial<AnimateStyle>;
+  from?: Partial<AnimateStyle>;
+  to?: Partial<AnimateStyle>;
+  style?: Partial<AnimateStyle>;
+} & OneOfAnimConf;
+
+export type RMotionInternalProps = OneOfAnimConf & {
   children?: React.ReactNode;
   onDidAnimate: () => void;
   onWillAnimate: () => void;
   forwardRef?: React.Ref<any>;
   combineAnimate?: boolean;
+  animate?: AnimationConf;
 };
 
 export type RMotionProps = Omit<
@@ -155,15 +166,22 @@ export type RMotionProps = Omit<
         exit?: AnimationConf;
         animate?: AnimationConf;
         from?: undefined;
+        keyframes?: false;
       }
     | {
+        keyframes?: false;
         from: Partial<AnimateStyle>;
         animate?: Partial<AnimateStyle>;
         exit?: Partial<AnimateStyle>;
+      }
+    | {
+        from?: undefined;
+        animate?: KeyframesAnimate;
+        exit?: KeyframesAnimate;
+        keyframes: true;
       }
   );
 
 export type AnimationProps = RMotionProps;
 
 export type ConfRef = Record<string, BasisConf | ColorConf>;
-export type { AnimatePresenceProps };

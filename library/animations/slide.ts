@@ -1,6 +1,6 @@
 import { Dimensions } from 'react-native';
-import { AnimationConf } from '../types';
-import { keys, injectTranslate } from './utils';
+import { KeyframesAnimate } from '../types';
+import { keys, extractTranslation } from './utils';
 
 export type SlideType = 'Down' | 'Up' | 'Left' | 'Right';
 
@@ -14,31 +14,41 @@ const slideTranslation = {
     translateY: -height,
   },
   Left: {
-    translateX: width,
+    translateX: -width,
   },
   Right: {
-    translateX: -width,
+    translateX: width,
   },
 };
 
 export const {
-  slideDownIn,
-  slideDownOut,
-  slideLeftOut,
-  slideLeftIn,
-  slideRightOut,
-  slideRightIn,
-  slideUpOut,
-  slideUpIn,
+  slideInDown,
+  slideInLeft,
+  slideInRight,
+  slideInUp,
+  slideOutDown,
+  slideOutLeft,
+  slideOutUp,
+  slideOutRight,
 } = keys(slideTranslation).reduce((previousValue, currentValue) => {
-  previousValue[`slide${currentValue}In`] = injectTranslate(
-    {},
+  const [translationType, value] = extractTranslation(
     slideTranslation[currentValue],
   );
-  previousValue[`slide${currentValue}Out`] = injectTranslate(
-    {},
-    slideTranslation[currentValue],
-    true,
-  );
+  previousValue[`slideIn${currentValue}`] = {
+    from: {
+      [translationType]: value,
+    },
+    to: {
+      [translationType]: 0,
+    },
+  };
+  previousValue[`slideOut${currentValue}`] = {
+    from: {
+      [translationType]: 0,
+    },
+    to: {
+      [translationType]: value,
+    },
+  };
   return previousValue;
-}, {} as Record<`slide${SlideType}In` | `slide${SlideType}Out`, AnimationConf>);
+}, {} as Record<`slideIn${SlideType}` | `slideOut${SlideType}`, KeyframesAnimate>);

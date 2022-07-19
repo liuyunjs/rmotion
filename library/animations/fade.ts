@@ -1,5 +1,5 @@
-import { AnimationConf } from '../types';
-import { keys, injectTranslate } from './utils';
+import { KeyframesAnimate } from '../types';
+import { keys, extractTranslation } from './utils';
 import { ZoomType } from './zoom';
 
 export type FadeType = ZoomType | 'DownBig' | 'UpBig' | 'LeftBig' | 'RightBig';
@@ -12,10 +12,10 @@ const fadeTranslation = {
     translateY: -100,
   },
   Left: {
-    translateX: 100,
+    translateX: -100,
   },
   Right: {
-    translateX: -100,
+    translateX: 100,
   },
   DownBig: {
     translateY: 500,
@@ -24,21 +24,37 @@ const fadeTranslation = {
     translateY: -500,
   },
   LeftBig: {
-    translateX: 500,
-  },
-  RightBig: {
     translateX: -500,
   },
+  RightBig: {
+    translateX: 500,
+  },
 };
 
-const markFadeInAnimation = (type: FadeType): AnimationConf => {
-  const animate: AnimationConf = { opacity: [0, 1] };
-  return type ? injectTranslate(animate, fadeTranslation[type]) : animate;
-};
+const markFadeAnimation = (
+  type: FadeType,
+  reverse?: boolean,
+): KeyframesAnimate => {
+  const animate: KeyframesAnimate = {
+    0: {
+      opacity: 0,
+    },
+    1: {
+      opacity: 1,
+    },
+  };
+  if (type) {
+    const [translationType, value] = extractTranslation(fadeTranslation[type]);
+    animate[0]![translationType] = value;
+    animate[1]![translationType] = 0;
+  }
 
- const markFadeOutAnimation = (type: FadeType): AnimationConf => {
-  const animate: AnimationConf = { opacity: [1, 0] };
-  return type ? injectTranslate(animate, fadeTranslation[type], true) : animate;
+  if (reverse) {
+    const from = animate[0];
+    animate[0] = animate[1];
+    animate[1] = from;
+  }
+  return animate;
 };
 
 const fadeTypes: FadeType[] = keys(fadeTranslation);
@@ -47,24 +63,24 @@ fadeTypes.push('');
 export const {
   fadeIn,
   fadeOut,
-  fadeDownOut,
-  fadeDownBigOut,
-  fadeDownBigIn,
-  fadeLeftOut,
-  fadeLeftBigIn,
-  fadeLeftBigOut,
-  fadeDownIn,
-  fadeRightBigOut,
-  fadeRightIn,
-  fadeRightOut,
-  fadeRightBigIn,
-  fadeLeftIn,
-  fadeUpBigOut,
-  fadeUpBigIn,
-  fadeUpOut,
-  fadeUpIn,
+  fadeOutRight,
+  fadeInRight,
+  fadeInLeft,
+  fadeOutDown,
+  fadeOutLeft,
+  fadeInDown,
+  fadeOutUp,
+  fadeInUp,
+  fadeOutDownBig,
+  fadeOutLeftBig,
+  fadeOutUpBig,
+  fadeInUpBig,
+  fadeOutRightBig,
+  fadeInRightBig,
+  fadeInLeftBig,
+  fadeInDownBig,
 } = fadeTypes.reduce((previous, current) => {
-  previous[`fade${current}In`] = markFadeInAnimation(current);
-  previous[`fade${current}Out`] = markFadeOutAnimation(current);
+  previous[`fadeIn${current}`] = markFadeAnimation(current);
+  previous[`fadeOut${current}`] = markFadeAnimation(current, true);
   return previous;
-}, {} as Record<`fade${FadeType}In` | `fade${FadeType}Out`, AnimationConf>);
+}, {} as Record<`fadeIn${FadeType}` | `fadeOut${FadeType}`, KeyframesAnimate>);

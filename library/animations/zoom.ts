@@ -1,16 +1,18 @@
-import { AnimationConf } from '../types';
-import { defineTimingAnimate, keys, injectTranslateInternal, zoomEasing } from './utils';
+import { KeyframesAnimate } from '../types';
+import { keys, zoomEasing, extractTranslation } from './utils';
 import { SlideType } from './slide';
-
+import { Dimensions } from 'react-native';
 
 export type ZoomType = SlideType | '';
 
+const { width, height } = Dimensions.get('window');
+
 const zoomTranslation = {
   Down: {
-    translateY: -60,
+    translateY: 60,
   },
   Up: {
-    translateY: 60,
+    translateY: -60,
   },
   Left: {
     translateX: 10,
@@ -20,56 +22,85 @@ const zoomTranslation = {
   },
 };
 
-
-
 export const zoomIn = {
-  opacity: defineTimingAnimate([0, [1, 0.5]]),
-  scale: [0.3, 1],
+  from: {
+    opacity: 0,
+    scale: 0.3,
+  },
+  0.5: {
+    opacity: 1,
+  },
+  to: {
+    opacity: 1,
+    scale: 1,
+  },
 };
 
 export const zoomOut = {
-  opacity: defineTimingAnimate([1, [1, 0.5], [0, 0.5]]),
-  scale: defineTimingAnimate([1, [0.3, 0.5], [0, 0.5]]),
+  from: {
+    opacity: 1,
+    scale: 1,
+  },
+  0.5: {
+    opacity: 1,
+    scale: 0.3,
+  },
+  to: {
+    opacity: 0,
+    scale: 0,
+  },
 };
 
 export const {
-  zoomDownIn,
-  zoomDownOut,
-  zoomLeftOut,
-  zoomRightOut,
-  zoomRightIn,
-  zoomLeftIn,
-  zoomUpOut,
-  zoomUpIn,
+  zoomInDown,
+  zoomOutDown,
+  zoomOutRight,
+  zoomInRight,
+  zoomOutLeft,
+  zoomInLeft,
+  zoomOutUp,
+  zoomInUp,
 } = keys(zoomTranslation).reduce((previous, current) => {
-  previous[`zoom${current}In`] = injectTranslateInternal(
-    {
-      scale: defineTimingAnimate([0.1, [0.457, 0.6], [1, 0.4]], zoomEasing),
-      opacity: defineTimingAnimate([0, [1, 0.6]], zoomEasing),
-    },
+  const [translationType, pivotPoint] = extractTranslation(
     zoomTranslation[current],
-    (pivotPoint) => {
-      const modifier = Math.min(1, Math.max(-1, pivotPoint));
-      return defineTimingAnimate(
-        [modifier * -1000, [pivotPoint, 0.6], [0, 0.4]],
-        zoomEasing,
-      );
-    },
   );
+  const modifier = Math.min(1, Math.max(-1, pivotPoint));
+  previous[`zoomIn${current}`] = {
+    easing: zoomEasing,
+    0: {
+      opacity: 0,
+      scale: 0.1,
+      [translationType]: modifier * -1000,
+    },
+    0.6: {
+      opacity: 1,
+      scale: 0.457,
+      [translationType]: pivotPoint,
+    },
+    1: {
+      scale: 1,
+      [translationType]: 0,
+    },
+  };
 
-  previous[`zoom${current}Out`] = injectTranslateInternal(
-    {
-      scale: defineTimingAnimate([1, [0.457, 0.4], [0, 0.6]], zoomEasing),
-      opacity: defineTimingAnimate([1, [1, 0.4], [0, 0.6]], zoomEasing),
+  previous[`zoomOut${current}`] = {
+    easing: zoomEasing,
+    0: {
+      opacity: 1,
+      scale: 1,
+      [translationType]: 0,
     },
-    zoomTranslation[current],
-    (pivotPoint) => {
-      const modifier = Math.min(1, Math.max(-1, pivotPoint));
-      return defineTimingAnimate(
-        [0, [pivotPoint, 0.4], [modifier * -1000, 0.6]],
-        zoomEasing,
-      );
+    0.4: {
+      opacity: 1,
+      scale: 0.457,
+      [translationType]: pivotPoint,
     },
-  );
+    1: {
+      opacity: 0,
+      scale: 0.1,
+      [translationType]: modifier * -1000,
+    },
+  };
+
   return previous;
-}, {} as Record<`zoom${SlideType}In` | `zoom${SlideType}Out`, AnimationConf>);
+}, {} as Record<`zoomIn${SlideType}` | `zoomOut${SlideType}`, KeyframesAnimate>);
